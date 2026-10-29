@@ -1,0 +1,64 @@
+@model IEnumerable<Producto>
+
+<link href="https://fonts.googleapis.com/css2?family=Poppins:wght@600&display=swap" rel="stylesheet">
+
+<h2 class="mb-3 text-center" style="font-family: 'Poppins', sans-serif;">Productos</h2>
+
+@using (Html.BeginForm("Index", "Producto", FormMethod.Get, new { @class = "mx-auto mb-4", style = "max-width: 900px;" }))
+{
+    <div class="row g-2 mb-2">
+        <div class="col">
+            @Html.TextBox("buscar", (string)ViewBag.Buscar, new { @class = "form-control", placeholder = "Buscar producto..." })
+        </div>
+        <div class="col-auto d-flex gap-2" style="width: 260px;">
+            <button class="btn btn-success flex-fill" type="submit">Buscar</button>
+            <a asp-action="Index" class="btn btn-secondary flex-fill">Limpiar</a>
+        </div>
+    </div>
+
+    <div class="row g-2">
+        <div class="col">
+            @Html.DropDownList("categoria", (SelectList)ViewBag.Categorias, "Categorías", new { @class = "form-select" })
+        </div>
+        <div class="col">
+            @Html.DropDownList("marca", (SelectList)ViewBag.Marcas, "Marcas", new { @class = "form-select" })
+        </div>
+        <div class="col-auto" style="width: 260px;">
+            <button type="button" class="btn btn-primary w-100" data-bs-toggle="modal" data-bs-target="#modalAgregar">Agregar producto</button>
+        </div>
+    </div>
+}
+
+<div class="row row-cols-2 row-cols-md-5 g-3 mx-auto" style="max-width: 1000px;">
+    @foreach (var p in Model)
+    {
+        <div class="col">
+            <div class="card h-100 text-center shadow-sm">
+                <div class="ratio ratio-1x1">
+                    <img src="/Images/Productos/@p.prod_imagen" alt="@p.prod_nombre" style="object-fit: cover;">
+                </div>
+                <div class="card-body p-2">
+                    <h6 class="card-title mb-1">@p.prod_nombre</h6>
+                    <p class="text-muted small mb-1">@p.prod_marca?.mar_nombre</p>
+                    <p class="fw-bold mb-0">@p.prod_precio.ToString("C")</p>
+                </div>
+                <div class="card-footer bg-transparent border-0 p-2">
+                    <a asp-action="Detalle" asp-route-id="@p.prod_id"
+                       class="btn btn-outline-primary btn-sm w-100">Ver detalle</a>
+                </div>
+            </div>
+        </div>
+    }
+</div>
+
+
+<div class="modal fade" id="modalAgregar" tabindex="-1" data-bs-backdrop="static" data-bs-keyboard="false">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <div class="modal-header justify-content-center" style="background-color: #0a5096;">
+                <h5 class="modal-title" style="color: white;">Agregar producto</h5>
+            </div>
+            <partial name="Agregar" model="new Producto()" />
+        </div>
+    </div>
+</div>

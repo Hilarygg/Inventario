@@ -1,0 +1,77 @@
+@model Login
+
+@{
+    ViewData["Title"] = "Iniciar sesión";
+    Layout = "_LayoutLogin";
+}
+
+<style>
+    .login-naranja { background: #f97316; color: #fff; }
+    .login-azul { background: #0f1e3d; color: #fff; }
+    .btn-orange {
+        --bs-btn-color: #fff;
+        --bs-btn-bg: #f97316;
+        --bs-btn-border-color: #f97316;
+        --bs-btn-hover-color: #fff;
+        --bs-btn-hover-bg: #ea580c;
+        --bs-btn-hover-border-color: #ea580c;
+        --bs-btn-active-color: #fff;
+        --bs-btn-active-bg: #c2410c;
+        --bs-btn-active-border-color: #c2410c;
+    }
+
+    .input-linea {
+    background: transparent;
+    border: 0;
+    border-bottom: 1px solid rgba(255, 255, 255, 0.6);
+    border-radius: 0;
+    color: #fff;
+    padding-left: 0;
+    box-shadow: none;
+}
+.input-linea:focus {
+    background: transparent;
+    color: #fff;
+    border-bottom: 2px solid #f97316;
+    box-shadow: none;
+}
+.input-linea::placeholder {
+    color: rgba(255, 255, 255, 0.5);
+}
+</style>
+
+<div class="container-fluid p-0 w-100">
+    <div class="row g-0 min-vh-100">
+
+        <div class="col-md-6 d-none d-md-block p-0 login-naranja">
+            <img src="/Images/login.png" alt="SuperCampestre" class="w-100 h-100" style="object-fit: cover;">
+        </div>
+
+        <div class="col-md-6 login-azul d-flex flex-column justify-content-center align-items-center p-4">
+    <div class="w-100" style="max-width: 360px;">
+        <h3 class="fw-bold text-center mb-4">Iniciar sesión</h3>
+
+        @if (ViewBag.Error != null)
+        {
+            <div class="alert alert-danger py-2 small">@ViewBag.Error</div>
+        }
+
+        @using (Html.BeginForm("Index", "Login", FormMethod.Post))
+        {
+            <div class="mb-3">
+                @Html.LabelFor(m => m.usu_username, "Usuario", new { @class = "form-label" })
+                @Html.TextBoxFor(m => m.usu_username, new { @class = "form-control input-linea", placeholder = "Ingresa tu usuario" })
+            </div>
+            <div class="mb-4">
+                @Html.LabelFor(m => m.usu_password, "Password", new { @class = "form-label" })
+                @Html.PasswordFor(m => m.usu_password, new { @class = "form-control input-linea", placeholder = "Ingresa tu contraseña" })
+            </div>
+            <button type="submit" class="btn btn-orange w-100 rounded-pill">
+                <i class="bi bi-person-fill me-1"></i>Entrar
+            </button>
+        }
+    </div>
+</div>
+
+    </div>
+</div>

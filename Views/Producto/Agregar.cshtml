@@ -1,0 +1,51 @@
+@model Producto
+
+@using (Html.BeginForm("Agregar ", "Producto", FormMethod.Post))
+{
+    <div class="modal-body">
+        <div class="mb-2">
+            @Html.LabelFor(m => m.prod_nombre, "Nombre", new { @class = "form-label" })
+            @Html.TextBoxFor(m => m.prod_nombre, new { @class = "form-control", required = "required" })
+        </div>
+        <div class="mb-2">
+            @Html.LabelFor(m => m.prod_descripcion, "Descripción", new { @class = "form-label" })
+            @Html.TextBoxFor(m => m.prod_descripcion, new { @class = "form-control" })
+        </div>
+        <div class="mb-2">
+            @Html.LabelFor(m => m.prod_codigoBarras, "Código de barras", new { @class = "form-label" })
+            @Html.TextBoxFor(m => m.prod_codigoBarras, new { @class = "form-control" })
+        </div>
+        <div class="row g-2 mb-2">
+            <div class="col">
+                @Html.LabelFor(m => m.prod_precio, "Precio", new { @class = "form-label" })
+                @Html.TextBoxFor(m => m.prod_precio, new { @class = "form-control", type = "number", step = "0.01" })
+            </div>
+            <div class="col">
+                @Html.LabelFor(m => m.prod_costo, "Costo", new { @class = "form-label" })
+                @Html.TextBoxFor(m => m.prod_costo, new { @class = "form-control", type = "number", step = "0.01" })
+            </div>
+            <div class="col">
+                @Html.LabelFor(m => m.prod_stock, "Stock", new { @class = "form-label" })
+                @Html.TextBoxFor(m => m.prod_stock, new { @class = "form-control", type = "number", step = "0.01" })
+            </div>
+        </div>
+        <div class="mb-2">
+            @Html.LabelFor(m => m.prod_imagen, "Imagen (nombre del archivo)", new { @class = "form-label" })
+            @Html.TextBoxFor(m => m.prod_imagen, new { @class = "form-control", placeholder = "leche.jpg" })
+        </div>
+        <div class="row g-2">
+            <div class="col">
+                @Html.LabelFor(m => m.prod_categoria!.cat_id, "Categoría", new { @class = "form-label" })
+                @Html.DropDownListFor(m => m.prod_categoria!.cat_id, (SelectList)ViewBag.Categorias, "Seleccione", new { @class = "form-select" })
+            </div>
+            <div class="col">
+                @Html.LabelFor(m => m.prod_marca!.mar_id, "Marca", new { @class = "form-label" })
+                @Html.DropDownListFor(m => m.prod_marca!.mar_id, (SelectList)ViewBag.Marcas, "Seleccione", new { @class = "form-select" })
+            </div>
+        </div>
+    </div>
+    <div class="modal-footer">
+        <button type="button" class="btn btn-danger" data-bs-dismiss="modal">Cancelar</button>
+        <button type="submit" class="btn btn-success">Guardar</button>
+    </div>
+}

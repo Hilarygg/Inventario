@@ -1,0 +1,30 @@
+@model List<Inventario.Models.Categoria>
+@{
+    ViewData["Title"] = "Categorías";
+}
+
+<div class="container-fluid px-5 py-4">
+    <div class="mb-3">
+        <h4 class="titulo-seccion mb-1">Todas las categorías</h4>
+        <div class="linea-naranja"></div>
+    </div>
+
+    <div class="row row-cols-2 row-cols-md-5 g-3">
+        @foreach (var c in Model)
+        {
+            string imagen = c.cat_imagen ?? "default.jpg";
+
+            <div class="col">
+                <a href="@Url.Action("Index", "Producto", new { categoria = c.cat_id })" class="text-decoration-none text-dark">
+                    <div class="card card-categoria shadow-sm h-100">
+                        <img src="@Url.Content("~/Images/categorias/" + imagen)" alt="@c.cat_nombre" class="card-img-top">
+                        <div class="card-body d-flex align-items-center gap-2 py-3">
+                            <i class="bi bi-tag fs-4 verde"></i>
+                            <span class="small fw-semibold">@c.cat_nombre</span>
+                        </div>
+                    </div>
+                </a>
+            </div>
+        }
+    </div>
+</div>

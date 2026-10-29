@@ -1,7 +1,10 @@
-var builder = WebApplication.CreateBuilder(args);
+using Microsoft.Extensions.FileProviders;
 
+var builder = WebApplication.CreateBuilder(args);
+    
 // Add services to the container.
 builder.Services.AddControllersWithViews();
+builder.Services.AddAuthentication("Cookies").AddCookie("Cookies", o => o.LoginPath = "/Login");
 
 var app = builder.Build();
 
@@ -13,9 +16,16 @@ if (!app.Environment.IsDevelopment())
     app.UseHsts();
 }
 
+app.UseStaticFiles(new StaticFileOptions
+{
+    FileProvider = new PhysicalFileProvider(Path.Combine(builder.Environment.ContentRootPath, "Images")),
+    RequestPath = "/Images"
+});
+
 app.UseHttpsRedirection();
 app.UseRouting();
 
+app.UseAuthentication();
 app.UseAuthorization();
 
 app.MapStaticAssets();
@@ -25,5 +35,6 @@ app.MapControllerRoute(
     pattern: "{controller=Home}/{action=Index}/{id?}")
     .WithStaticAssets();
 
+Console.WriteLine(BCrypt.Net.BCrypt.HashPassword("123"));
 
 app.Run();

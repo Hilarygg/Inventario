@@ -1,0 +1,83 @@
+@{
+    ViewData["Title"] = "Inicio";
+}
+
+<link href="https://fonts.googleapis.com/css2?family=Poppins:wght@600&display=swap" rel="stylesheet">
+
+<h2 class="mb-4 text-center" style="font-family: 'Poppins', sans-serif;">Resumen general</h2>
+
+<div class="mx-auto" style="max-width: 1000px;">
+
+    <div class="row row-cols-2 row-cols-md-4 g-3 mb-4">
+        <div class="col">
+            <div class="card text-center shadow-sm h-100">
+                <div class="card-body">
+                    <i class="bi bi-box-seam fs-2 text-primary"></i>
+                    <h3 class="mb-0">248</h3>
+                    <p class="text-muted small mb-0">Productos</p>
+                </div>
+            </div>
+        </div>
+        <div class="col">
+            <div class="card text-center shadow-sm h-100">
+                <div class="card-body">
+                    <i class="bi bi-exclamation-triangle fs-2 text-warning"></i>
+                    <h3 class="mb-0">12</h3>
+                    <p class="text-muted small mb-0">Stock bajo</p>
+                </div>
+            </div>
+        </div>
+        <div class="col">
+            <div class="card text-center shadow-sm h-100">
+                <div class="card-body">
+                    <i class="bi bi-cart-check fs-2 text-success"></i>
+                    <h3 class="mb-0">35</h3>
+                    <p class="text-muted small mb-0">Ventas de hoy</p>
+                </div>
+            </div>
+        </div>
+        <div class="col">
+            <div class="card text-center shadow-sm h-100">
+                <div class="card-body">
+                    <i class="bi bi-cash-coin fs-2 text-success"></i>
+                    <h3 class="mb-0">$8,450</h3>
+                    <p class="text-muted small mb-0">Total del día</p>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div class="row g-3">
+        <div class="col-md-8">
+            <div class="card shadow-sm h-100">
+                <div class="card-header bg-transparent fw-bold">Productos con stock bajo</div>
+                <table class="table mb-0">
+                    <thead>
+                        <tr>
+                            <th>Producto</th>
+                            <th>Marca</th>
+                            <th class="text-end">Stock</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <tr><td>Leche entera 1L</td><td>Marca 1</td><td class="text-end text-danger">3</td></tr>
+                        <tr><td>Arroz 1kg</td><td>Marca 2</td><td class="text-end text-danger">5</td></tr>
+                        <tr><td>Aceite 900ml</td><td>Marca 1</td><td class="text-end text-warning">8</td></tr>
+                    </tbody>
+                </table>
+            </div>
+        </div>
+
+        <div class="col-md-4">
+            <div class="card shadow-sm h-100">
+                <div class="card-header bg-transparent fw-bold">Accesos rápidos</div>
+                <div class="card-body d-grid gap-2">
+                    <a asp-controller="Producto" asp-action="Index" class="btn btn-primary">Ver productos</a>
+                    <a href="#" class="btn btn-success">Nueva venta</a>
+                    <a href="#" class="btn btn-outline-secondary">Nueva compra</a>
+                </div>
+            </div>
+        </div>
+    </div>
+
+</div>

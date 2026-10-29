@@ -1,8 +1,198 @@
-﻿@{
-    ViewData["Title"] = "Home Page";
+﻿@model List<Categoria>
+
+@{
+    ViewData["Title"] = "Bienvenido";
+    var productos = (IEnumerable<Inventario.Models.Producto>)ViewBag.Productos;
 }
 
-<div class="text-center">
-    <h1 class="display-4">Welcome</h1>
-    <p>Learn about <a href="https://learn.microsoft.com/aspnet/core">building Web apps with ASP.NET Core</a>.</p>
+<link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;600;700&display=swap" rel="stylesheet">
+
+<style>
+    .hero {
+        position: relative;
+        overflow: hidden;
+        margin-left: -1.5rem;
+        margin-right: -1.5rem;
+        margin-top: -2rem;
+        background: #f4faf0;
+        font-family: 'Poppins', sans-serif;
+    }
+    .hero-fondo {
+        position: absolute;
+        inset: 0;
+        background: url('/Images/Home.png') right center / cover no-repeat;
+    }
+    .hero-fondo::after {
+        content: '';
+        position: absolute;
+        inset: 0;
+        background: linear-gradient(to right, #f4faf0 10%, rgba(244, 250, 240, 0) 75%);
+    }
+    .hero-contenido {
+        position: relative;
+        z-index: 1;
+    }
+    .hero h1 { font-weight: 700; font-size: 3rem; line-height: 1.15; }
+    .verde { color: #1b7a2e; }
+    .btn-verde { background: #1b6b2a; color: #fff; border-radius: 12px; }
+    .btn-verde:hover { background: #155522; color: #fff; }
+    .btn-orange { background: #f97316; color: #fff; border-radius: 12px; transition: all 0.2s; }
+    .btn-orange:hover { background: #ea6a0a; color: #fff; transform: translateY(-2px); }
+
+    .titulo-seccion { color: #1b5e2a; font-weight: 700; font-family: 'Poppins', sans-serif; }
+    .linea-naranja { width: 40px; height: 3px; background: #f97316; border-radius: 2px; }
+    .card-categoria { border: 0; border-radius: 14px; overflow: hidden; transition: all 0.2s; }
+    .card-categoria:hover { transform: translateY(-4px); box-shadow: 0 8px 20px rgba(0,0,0,.12) !important; }
+    .card-categoria img { height: 140px; object-fit: cover; }
+    .ver-todas { color: #f97316; text-decoration: none; font-size: .9rem; }
+    .ver-todas:hover { color: #ea580c; }
+    .text-orange { color: #f97316; }
+
+    .card-producto img {
+        height: 130px;
+        width: 100%;
+        object-fit: contain;
+    }
+
+    .icono-circulo {
+        width: 48px;
+        height: 48px;
+        min-width: 48px;
+        border-radius: 50%;
+        background: #dcebd5;
+        color: #1b6b2a;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        font-size: 1.3rem;
+    }
+</style>
+
+<div class="hero">
+    <div class="hero-fondo"></div>
+
+    <div class="hero-contenido">
+        <div class="container-fluid px-5 py-5">
+            <div class="row align-items-center g-4">
+
+                <div class="col-md-6">
+                    <span class="badge rounded-pill bg-white text-success border px-3 py-2 mb-3">
+                        <i class="bi bi-leaf"></i> Lo mejor para ti y tu hogar
+                    </span>
+                    <h1>Todo lo que necesitas,<br><span class="verde">cerca de ti</span></h1>
+                    <p class="text-muted my-4">
+                        En SuperCampestre tenemos una gran variedad de productos <br />
+                        para tu hogar y tu familia, con la mejor calidad y los precios <br />
+                        mas competitivos.
+                    </p>
+                    <a href="#informacion" class="btn btn-orange px-4 py-2"><i class="bi bi-cart3 me-1"></i> Conoce nuestros productos <i class="bi bi-arrow-right"></i></a>
+                </div>
+
+            </div>
+        </div>
+    </div>
+</div>
+
+<div class="container-fluid px-5 py-4">
+    <div class="d-flex justify-content-between align-items-start mb-3">
+        <div>
+            <h4 class="titulo-seccion mb-1">Explora nuestras categorías</h4>
+            <div class="linea-naranja"></div>
+        </div>
+        <a href="@Url.Action("Index", "Categoria")" class="ver-todas">Ver todas las categorías <i class="bi bi-arrow-right"></i></a>
+    </div>
+
+    <div class="row row-cols-2 row-cols-md-5 g-3">
+        @foreach (var c in Model)
+        {
+            string imagenCategoria = c.cat_imagen ?? "default.jpg";
+
+            <div class="col">
+                <a href="@Url.Action("Index", "Producto", new { categoria = c.cat_id })" class="text-decoration-none text-dark">
+                    <div class="card card-categoria shadow-sm h-100">
+                        <img src="@Url.Content("~/Images/categorias/" + imagenCategoria)" alt="@c.cat_nombre" class="card-img-top">
+                        <div class="card-body d-flex align-items-center gap-2 py-3">
+                            <i class="bi bi-tag fs-4 verde"></i>
+                            <span class="small fw-semibold">@c.cat_nombre</span>
+                        </div>
+                    </div>
+                </a>
+            </div>
+        }
+    </div>
+</div>
+
+<div class="container-fluid px-5 py-4">
+    <div class="d-flex justify-content-between align-items-start mb-3">
+        <div>
+            <h4 class="titulo-seccion mb-1">Productos Destacados</h4>
+            <div class="linea-naranja"></div>
+        </div>
+        <a href="@Url.Action("Index", "Producto")" class="ver-todas">Ver más productos <i class="bi bi-arrow-right"></i></a>
+    </div>
+
+    <div class="row row-cols-2 row-cols-md-6 g-3">
+        @foreach (var p in productos)
+        {
+            string imagenProducto = p.prod_imagen ?? "default.jpg";
+
+            <div class="col">
+                <div class="card card-producto shadow-sm p-2">
+                    <img src="@Url.Content("~/Images/Productos/" + imagenProducto)" alt="@p.prod_nombre" class="card-img-top">
+                    <div class="card-body p-0 pt-2 ps-3">
+                        <span class="small fw-semibold">@p.prod_nombre</span> <br />
+                        <span class="fw-bold text-orange small">@p.prod_precio.ToString("C")</span>
+                    </div>
+                </div>
+            </div>
+        }
+    </div>
+</div>
+
+<div style="margin-left: -1.5rem; margin-right: -1.5rem; margin-bottom: -2.8rem; margin-top: 3rem; background: #eef3e8;">
+    <div class="container-fluid px-5 py-5">
+        <div class="row g-4 align-items-center">
+
+            <div class="col-md-3">
+                <div class="ms-5">
+                    <h5 class="titulo-seccion mb-2">¿Por qué elegir<br>SuperCampestre?</h5>
+                    <div class="linea-naranja"></div>
+                </div>
+            </div>
+
+            <div class="col-md-9">
+                <div class="row row-cols-1 row-cols-md-4 g-3">
+                    <div class="col d-flex align-items-center gap-3">
+                        <div class="icono-circulo"><i class="bi bi-flower1"></i></div>
+                        <div>
+                            <strong class="small">Productos frescos y de calidad</strong><br>
+                            <span class="text-muted small">Seleccionamos lo mejor para tu familia.</span>
+                        </div>
+                    </div>
+                    <div class="col d-flex align-items-center gap-3">
+                        <div class="icono-circulo"><i class="bi bi-tag"></i></div>
+                        <div>
+                            <strong class="small">Precios competitivos</strong><br>
+                            <span class="text-muted small">Ahorra en cada compra, siempre.</span>
+                        </div>
+                    </div>
+                    <div class="col d-flex align-items-center gap-3">
+                        <div class="icono-circulo"><i class="bi bi-shop"></i></div>
+                        <div>
+                            <strong class="small">Varias sucursales</strong><br>
+                            <span class="text-muted small">Más cerca de ti, en tu comunidad.</span>
+                        </div>
+                    </div>
+                    <div class="col d-flex align-items-center gap-3">
+                        <div class="icono-circulo"><i class="bi bi-people"></i></div>
+                        <div>
+                            <strong class="small">Atención cercana</strong><br>
+                            <span class="text-muted small">Nuestro compromiso es contigo.</span>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+        </div>
+    </div>
 </div>
