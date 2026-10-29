@@ -1,0 +1,29 @@
+@model List<Inventario.Models.MenuItemVM>
+
+<aside class="sidebar">
+    <ul class="nav flex-column">
+    @foreach (var item in Model)
+    {
+        if (item.Hijos.Any())
+        {
+            var id = "sub" + item.Nombre.Replace(" ", "");
+            <li>
+                <a class="nav-link" data-bs-toggle="collapse" href="#@id">
+                    <i class="bi @item.Icono"></i> @item.Nombre
+                    <i class="bi bi-chevron-down ms-auto"></i>
+                </a>
+                <ul class="collapse list-unstyled ps-4" id="@id">
+                    @foreach (var h in item.Hijos)
+                    {
+                        <li><a class="nav-link" href="@h.Ruta">@h.Nombre</a></li>
+                    }
+                </ul>
+            </li>
+        }
+        else
+        {
+            <li><a class="nav-link" href="@item.Ruta"><i class="bi @item.Icono"></i> @item.Nombre</a></li>
+        }
+    }
+    </ul>
+</aside>

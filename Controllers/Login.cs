@@ -25,7 +25,8 @@ public class LoginController : Controller
         var claims = new List<Claim>
         {
             new Claim(ClaimTypes.NameIdentifier, modelo.usu_id.ToString()),
-            new Claim(ClaimTypes.Name, modelo.usu_nombre)
+            new Claim(ClaimTypes.Name, modelo.usu_nombre),
+            new Claim("RolId", modelo.usu_rol.ToString())
         };
 
         var identidad = new ClaimsIdentity(claims, CookieAuthenticationDefaults.AuthenticationScheme);

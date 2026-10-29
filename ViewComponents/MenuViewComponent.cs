@@ -15,7 +15,7 @@ public class MenuViewComponent : ViewComponent
             ?? throw new InvalidOperationException("Falta la cadena de conexión DefaultConnection.");
     }
 
-    public async Task<IViewComponentResult> InvokeAsync()
+    public async Task<IViewComponentResult> InvokeAsync(string vista = "Default")
     {
         bool autenticado = UserClaimsPrincipal.Identity?.IsAuthenticated == true;
 
@@ -76,6 +76,6 @@ public class MenuViewComponent : ViewComponent
 
         var arbol = Construir(null);
 
-        return View("~/Views/Menu/Default.cshtml", arbol);
+    return View($"~/Views/Menu/{vista}.cshtml", arbol);
     }
 }

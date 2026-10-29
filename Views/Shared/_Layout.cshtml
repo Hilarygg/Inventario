@@ -2,6 +2,7 @@
 @{
     Layout = null;
     string titulo = ViewData["Title"]?.ToString() ?? "Inicio";
+    bool esAdmin = User.FindFirst("RolId")?.Value == "1";
 }
 
 <!DOCTYPE html>
@@ -20,89 +21,98 @@
     @await RenderSectionAsync("Styles", required: false)
 </head>
 
-<body class="d-flex flex-column min-vh-100 bg-light">
+    <body class="d-flex flex-column min-vh-100 bg-light">
 
-    <header class="sticky-top">
-        <nav class="navbar navbar-expand-lg navbar-dark navbar-orange">
-            <div class="container-fluid">
-
-                @Html.ActionLink(
-                    "🛒 SuperCampestre",
-                    "Index",
-                    "Home",
-                    null,
-                    new { @class = "navbar-brand fw-semibold ms-5" }
-                )
-
-                <button class="navbar-toggler"
-                        type="button"
-                        data-bs-toggle="collapse"
-                        data-bs-target="#mainNav"
-                        aria-controls="mainNav"
-                        aria-expanded="false"
-                        aria-label="Mostrar u ocultar navegación">
-                    <span class="navbar-toggler-icon"></span>
-                </button>
-
-                <div class="collapse navbar-collapse" id="mainNav">
-
-                    @await Component.InvokeAsync("Menu")
-
-                    <ul class="navbar-nav ms-auto">
-                        @if (User.Identity?.IsAuthenticated == true)
-                        {
-                            <li class="nav-item dropdown">
-                                <a class="nav-link dropdown-toggle"
-                                   href="#"
-                                   role="button"
-                                   data-bs-toggle="dropdown"
-                                   aria-expanded="false">
-                                    <i class="bi bi-person-circle me-1"></i>
-                                    @User.Identity.Name
-                                </a>
-
-                                <ul class="dropdown-menu dropdown-menu-end">
-                                    <li>
-                                        @Html.ActionLink(
-                                            "Mi perfil",
-                                            "Perfil",
-                                            "Cuenta",
-                                            null,
-                                            new { @class = "dropdown-item" }
-                                        )
-                                    </li>
-
-                                    <li><hr class="dropdown-divider" /></li>
-
-                                    <li>
-                                        @using (Html.BeginForm("Logout", "Login", FormMethod.Post))
-                                        {
-                                            <button type="submit" class="dropdown-item">
-                                                Cerrar sesión
-                                            </button>
-                                        }
-                                    </li>
-                                </ul>
-                            </li>
-                        }
-                        else
-                        {
-                            <li class="nav-item">
-                                <a class="nav-link" href="@Url.Action("Index", "Login")">
-                                    <i class="bi bi-box-arrow-in-right me-1"></i>Iniciar sesión
-                                </a>
-                            </li>
-                        }
-                    </ul>
-
-                </div>
+        @if (esAdmin)
+    {
+        <partial name="_LayoutAdmin" />
+            <div class="d-flex flex-grow-1">
+                @await Component.InvokeAsync("Menu", new { vista = "Sidebar" })
+                <main class="flex-grow-1 p-4">@RenderBody()</main>
             </div>
-        </nav>
-    </header>
+    }
+    else
+    {
+        <header class="sticky-top">
+            <nav class="navbar navbar-expand-lg navbar-dark navbar-orange">
+                <div class="container-fluid">
 
-    <main role="main" class="container-fluid flex-grow-1 py-4 px-4">
-        @RenderBody()
-    </main>
+                    <a class="navbar-brand fw-semibold ms-5" href="@Url.Action("Index", "Home")">
+                        🛒 <span class="text-dark">Super</span><span class="text-white">Campestre</span>
+                    </a>
+
+                    <button class="navbar-toggler"
+                            type="button"
+                            data-bs-toggle="collapse"
+                            data-bs-target="#mainNav"
+                            aria-controls="mainNav"
+                            aria-expanded="false"
+                            aria-label="Mostrar u ocultar navegación">
+                        <span class="navbar-toggler-icon"></span>
+                    </button>
+
+                    <div class="collapse navbar-collapse" id="mainNav">
+
+                        @await Component.InvokeAsync("Menu")
+
+                        <ul class="navbar-nav menu-centrado">
+                            @if (User.Identity?.IsAuthenticated == true)
+                            {
+                                <li class="nav-item dropdown">
+                                    <a class="nav-link dropdown-toggle"
+                                    href="#"
+                                    role="button"
+                                    data-bs-toggle="dropdown"
+                                    aria-expanded="false">
+                                        <i class="bi bi-person-circle me-1"></i>
+                                        @User.Identity.Name
+                                    </a>
+
+                                    <ul class="dropdown-menu dropdown-menu-end">
+                                        <li>
+                                            @Html.ActionLink(
+                                                "Mi perfil",
+                                                "Perfil",
+                                                "Cuenta",
+                                                null,
+                                                new { @class = "dropdown-item" }
+                                            )
+                                        </li>
+
+                                        <li><hr class="dropdown-divider" /></li>
+
+                                        <li>
+                                            @using (Html.BeginForm("Logout", "Login", FormMethod.Post))
+                                            {
+                                                <button type="submit" class="dropdown-item">
+                                                    Cerrar sesión
+                                                </button>
+                                            }
+                                        </li>
+                                    </ul>
+                                </li>
+                            }
+                            else
+                            {
+                                <li class="nav-item">
+                                    <a class="nav-link" href="@Url.Action("Index", "Login")">
+                                        <i class="bi bi-box-arrow-in-right me-1"></i>Iniciar sesión
+                                    </a>
+                                </li>
+                            }
+                        </ul>
+
+                    </div>
+                </div>
+            </nav>
+        </header>
+
+        <main role="main" class="container-fluid flex-grow-1 py-4 px-4">
+            @RenderBody()
+        </main>
+
+    }
+
 
     <footer class="footer-verde text-white mt-auto">
         <div class="container-fluid px-5 py-2">

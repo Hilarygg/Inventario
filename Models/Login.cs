@@ -8,11 +8,12 @@ public class Login : ConsultaBase
     public string usu_username { get; set; } = "";
     public string usu_nombre { get; set; } = "";
     public string usu_password { get; set; } = "";
+    public int usu_rol { get; set; }
 
     public bool Validar()
     {
-        string query = @"SELECT usu_id, usu_nombre, usu_password FROM Usuario
-                        WHERE usu_username = @usu_username AND usu_activo = 1";
+        string query = @"SELECT usu_id, usu_nombre, usu_password, usu_rol FROM Usuario
+                WHERE usu_username = @usu_username AND usu_activo = 1";
 
         Dictionary<string, object> parametros = new Dictionary<string, object>
         {
@@ -30,6 +31,7 @@ public class Login : ConsultaBase
             {
                 usu_id = reader.GetInt32(0);
                 usu_nombre = reader.GetString(1);
+                usu_rol = reader.GetInt32(3);
                 valido = true;
             }
         }

@@ -12,6 +12,8 @@ body {
   }
 }
 
+.navbar-orange { background-color: #f97316 !important; }
+
 .nav-link.active {
   font-weight: 600;
   color: #000 !important;
@@ -43,9 +45,14 @@ body {
     margin-right: 2rem;
 }
 
+.sidebar { width: 240px; background: #1e5a3a; padding: 1rem .5rem; }
+.sidebar .nav-link { color: #fff; display: flex; align-items: center; gap: .75rem; border-radius: .5rem; }
+.sidebar .nav-link:hover { background: rgba(255,255,255,.12); }
+
 .footer-verde {
     background: #1b6b2a;
 }
 .footer-linea {
     border-top: 1px solid rgba(255, 255, 255, 0.25);
 }
+
