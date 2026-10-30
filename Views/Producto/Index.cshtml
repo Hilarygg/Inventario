@@ -1,64 +1,103 @@
-@model IEnumerable<Producto>
+@model List<Inventario.Models.Producto>
 
-<link href="https://fonts.googleapis.com/css2?family=Poppins:wght@600&display=swap" rel="stylesheet">
+@{ ViewData["Title"] = "Productos"; }
 
-<h2 class="mb-3 text-center" style="font-family: 'Poppins', sans-serif;">Productos</h2>
+<nav aria-label="breadcrumb">
+    <ol class="breadcrumb">
+        <li class="breadcrumb-item">
+            <a href="@Url.Action("Panel", "Home")" class="text-success text-decoration-none">
+                <i class="bi bi-house-fill me-1"></i>Inicio
+            </a>
+        </li>
+        <li class="breadcrumb-item active" aria-current="page">Productos</li>
+    </ol>
+</nav>  
 
-@using (Html.BeginForm("Index", "Producto", FormMethod.Get, new { @class = "mx-auto mb-4", style = "max-width: 900px;" }))
-{
-    <div class="row g-2 mb-2">
-        <div class="col">
-            @Html.TextBox("buscar", (string)ViewBag.Buscar, new { @class = "form-control", placeholder = "Buscar producto..." })
-        </div>
-        <div class="col-auto d-flex gap-2" style="width: 260px;">
-            <button class="btn btn-success flex-fill" type="submit">Buscar</button>
-            <a asp-action="Index" class="btn btn-secondary flex-fill">Limpiar</a>
+<div class="d-flex justify-content-between align-items-center mb-4">
+    <div class="d-flex align-items-center gap-3">
+        <img src="/Images/cubo_verde.png" alt="Productos" style="height:60px" />
+        <div>
+            <h1 class="fw-bold mb-0">Lista de Productos</h1>
+            <p class="text-muted mb-0">Consulta, administra y mantén actualizado el catálogo de productos.</p>
         </div>
     </div>
+    @using (Html.BeginForm("Crear", "Producto", FormMethod.Get, new { @class = "m-0" }))
+    {
+        <button type="button" class="btn-agregar" data-bs-toggle="modal" data-bs-target="#modalProducto">
+            <span class="btn-agregar-icono"><i class="bi bi-plus-lg"></i></span>
+            Agregar producto
+        </button>
+    }
+</div>
 
-    <div class="row g-2">
-        <div class="col">
-            @Html.DropDownList("categoria", (SelectList)ViewBag.Categorias, "Categorías", new { @class = "form-select" })
+@using (Html.BeginForm("Index", "Producto", FormMethod.Get, new { @class = "card card-body mb-4" }))
+{
+    <div class="row g-3 align-items-end">
+        <div class="col-md-6">
+            <div class="input-group">
+                @Html.TextBox("buscar", (string)ViewBag.Buscar, new { @class = "form-control", placeholder = "Buscar por nombre, código o marca..." })
+                <button class="btn btn-success"><i class="bi bi-search me-1"></i>Buscar</button>
+            </div>
         </div>
-        <div class="col">
-            @Html.DropDownList("marca", (SelectList)ViewBag.Marcas, "Marcas", new { @class = "form-select" })
+        <div class="col-md-2">
+            <label class="form-label text-dark fw-semibold">Categoría</label>
+            @Html.DropDownList("categoria", (SelectList)ViewBag.Categorias, "Todas", new { @class = "form-select", onchange = "this.form.submit()" })
         </div>
-        <div class="col-auto" style="width: 260px;">
-            <button type="button" class="btn btn-primary w-100" data-bs-toggle="modal" data-bs-target="#modalAgregar">Agregar producto</button>
+        <div class="col-md-2">
+            <label class="form-label form-label text-dark fw-semibold">Marca</label>
+            @Html.DropDownList("marca", (SelectList)ViewBag.Marcas, "Todas", new { @class = "form-select", onchange = "this.form.submit()" })
+        </div>
+        <div class="col-md-2">
+            <label class="form-label form-label text-dark fw-semibold">Estado</label>
+            @Html.DropDownList("estado", (SelectList)ViewBag.Estados, new { @class = "form-select", onchange = "this.form.submit()" })
         </div>
     </div>
 }
 
-<div class="row row-cols-2 row-cols-md-5 g-3 mx-auto" style="max-width: 1000px;">
-    @foreach (var p in Model)
-    {
-        <div class="col">
-            <div class="card h-100 text-center shadow-sm">
-                <div class="ratio ratio-1x1">
-                    <img src="/Images/Productos/@p.prod_imagen" alt="@p.prod_nombre" style="object-fit: cover;">
-                </div>
-                <div class="card-body p-2">
-                    <h6 class="card-title mb-1">@p.prod_nombre</h6>
-                    <p class="text-muted small mb-1">@p.prod_marca?.mar_nombre</p>
-                    <p class="fw-bold mb-0">@p.prod_precio.ToString("C")</p>
-                </div>
-                <div class="card-footer bg-transparent border-0 p-2">
-                    <a asp-action="Detalle" asp-route-id="@p.prod_id"
-                       class="btn btn-outline-primary btn-sm w-100">Ver detalle</a>
-                </div>
-            </div>
-        </div>
-    }
+<div class="card">
+    <table class="table table-hover align-middle mb-0">
+        <thead class="table-success">
+            <tr>
+                <th>Imagen</th><th>Código</th><th>Nombre</th><th>Categoría</th>
+                <th>Marca</th><th>Precio</th><th>Stock</th><th>Estado</th>
+                <th>Acciones</th>
+            </tr>
+        </thead>
+        <tbody>
+        @foreach (var p in Model)
+        {
+            <tr>
+                <td><img src="/Images/Productos/@p.prod_imagen" alt="@p.prod_nombre" class="img-producto" /></td>
+                <td>@p.prod_codigo</td>
+                <td>@p.prod_nombre</td>
+                <td><span class="badge rounded-pill cat-@(p.prod_categoria?.cat_id % 6)">@p.prod_categoria?.cat_nombre</span></td>
+                <td>@p.prod_marca?.mar_nombre</td>
+                <td>@p.prod_precio.ToString("C")</td>
+                <td>@p.prod_stock.ToString("0.##")</td>
+                <td>
+                    <span class="badge rounded-pill @(p.prod_activo?.act_nombre == "Inactivo" ? "text-bg-danger" : "text-bg-success")">
+                        @p.prod_activo?.act_nombre
+                    </span>
+                </td>
+                <td>
+                    <a class="btn btn-naranja btn-sm" href="@Url.Action("Editar", "Producto", new { id = p.prod_id })">
+                        <i class="bi bi-pencil me-1"></i>Modificar
+                    </a>
+                </td>
+            </tr>
+        }
+        </tbody>
+    </table>
 </div>
 
-
-<div class="modal fade" id="modalAgregar" tabindex="-1" data-bs-backdrop="static" data-bs-keyboard="false">
-    <div class="modal-dialog">
+<div class="modal fade" id="modalProducto" tabindex="-1" aria-hidden="true">
+    <div class="modal-dialog modal-lg">
         <div class="modal-content">
-            <div class="modal-header justify-content-center" style="background-color: #0a5096;">
-                <h5 class="modal-title" style="color: white;">Agregar producto</h5>
+            <div class="modal-header">
+                <h5 class="modal-title">Agregar producto</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
             </div>
-            <partial name="Agregar" model="new Producto()" />
+            @await Html.PartialAsync("Agregar", new Inventario.Models.Producto())
         </div>
     </div>
 </div>

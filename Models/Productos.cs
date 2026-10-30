@@ -12,6 +12,7 @@ public class Producto : ConsultaBase
     public decimal prod_stock { get; set; }
     public string prod_imagen { get; set; } = "";
     public decimal prod_costo { get; set; }
+    public string prod_codigo { get; set; } = "";
     public DateTime prod_fecha { get; set; }
     public Activo? prod_activo { get; set; }
     public Categoria? prod_categoria { get; set; }
@@ -22,9 +23,12 @@ public class Producto : ConsultaBase
     public List<Producto> MostrarProductos()
     {
         string query = @"SELECT p.prod_id, p.prod_imagen, p.prod_nombre, p.prod_precioventa,
-                        m.mar_id, m.mar_nombre, p.prod_categoria
-                 FROM Producto p
-                 INNER JOIN Marca m ON p.prod_marca = m.mar_id";
+                m.mar_id, m.mar_nombre, c.cat_id, c.cat_nombre,
+                p.prod_codigoBarras, p.prod_stockMinimo, a.act_id, a.act_nombre
+         FROM Producto p
+         INNER JOIN Marca m ON p.prod_marca = m.mar_id
+         INNER JOIN Categoria c ON p.prod_categoria = c.cat_id
+         INNER JOIN Activo a ON p.prod_activo = a.act_id";
 
         SqlDataReader reader = null!;
         List<Producto> lista = new List<Producto>();
@@ -44,11 +48,21 @@ public class Producto : ConsultaBase
                     mar_id = reader.GetInt32(4),
                     mar_nombre = reader.GetString(5)
                 },
-                prod_categoria = new Categoria { cat_id = reader.GetInt32(6) }
+                prod_categoria = new Categoria()
+                { 
+                    cat_id = reader.GetInt32(6), 
+                    cat_nombre = reader.GetString(7),
+                },
+                prod_codigo = reader.GetString(8),
+                prod_stock = reader.GetDecimal(9),
+                prod_activo = new Activo()
+                {
+                    act_id = reader.GetInt32(10),
+                    act_nombre = reader.GetString(11)
+                }
             };
             lista.Add(producto);
         }
-
         return lista;
     }
 
@@ -84,7 +98,6 @@ public class Producto : ConsultaBase
 
         return lista;
     }
-
 
     public bool InsertProducto()
     {
