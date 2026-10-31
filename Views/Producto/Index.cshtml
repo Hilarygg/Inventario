@@ -58,7 +58,7 @@
     <table class="table table-hover align-middle mb-0">
         <thead class="table-success">
             <tr>
-                <th>Imagen</th><th>Código</th><th>Nombre</th><th>Categoría</th>
+                <th>Imagen</th><th>Código</th><th>Nombre</th><th>Contenido</th><th>Unidad</th><th>Categoría</th>
                 <th>Marca</th><th>Precio</th><th>Stock</th><th>Estado</th>
                 <th>Acciones</th>
             </tr>
@@ -70,6 +70,8 @@
                 <td><img src="/Images/Productos/@p.prod_imagen" alt="@p.prod_nombre" class="img-producto" /></td>
                 <td>@p.prod_codigo</td>
                 <td>@p.prod_nombre</td>
+                <td>@p.prod_contenido</td>
+                <td>@p.prod_unidad?.uni_abreviatura</td>
                 <td><span class="badge rounded-pill cat-@(p.prod_categoria?.cat_id % 6)">@p.prod_categoria?.cat_nombre</span></td>
                 <td>@p.prod_marca?.mar_nombre</td>
                 <td>@p.prod_precio.ToString("C")</td>
@@ -90,12 +92,11 @@
     </table>
 </div>
 
-<div class="modal fade" id="modalProducto" tabindex="-1" aria-hidden="true">
+<div class="modal fade" id="modalProducto" tabindex="-1" aria-hidden="true" data-bs-backdrop="static" data-bs-keyboard="false">
     <div class="modal-dialog modal-lg">
         <div class="modal-content">
-            <div class="modal-header">
+            <div class="modal-header bg-success text-white justify-content-center">
                 <h5 class="modal-title">Agregar producto</h5>
-                <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
             </div>
             @await Html.PartialAsync("Agregar", new Inventario.Models.Producto())
         </div>

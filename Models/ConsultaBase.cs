@@ -38,8 +38,9 @@ public class ConsultaBase
             conexion.Open();
             return comando.ExecuteNonQuery() > 0;
         }
-        catch
+        catch (Exception ex)
         {
+            Console.WriteLine(ex.Message);
             return false;
         }
     }

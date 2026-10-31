@@ -37,10 +37,28 @@ body {
     font-size: 1.4rem;
 }
 
+.zona-imagen {
+    border: 2px dashed #adb5bd;
+    border-radius: .75rem;
+    background: #fff;
+    cursor: pointer;
+    transition: .2s;
+}
+.zona-imagen:hover,
+.zona-imagen.arrastrando {
+    border-color: #198754;
+    background: #f1faf5;
+}
+.zona-imagen img {
+    max-height: 120px;
+    border-radius: .5rem;
+}
+
 .img-producto { width: 60px; height: 50px; object-fit: contain; }
 
 .table { table-layout: fixed; }
 .table th:first-child { width: 120px; }
+.table th, .table td { text-align: center; }
 
 @media (min-width: 768px) {
   html {

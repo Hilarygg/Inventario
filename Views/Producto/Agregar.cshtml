@@ -1,51 +1,124 @@
 @model Producto
 
-@using (Html.BeginForm("Agregar", "Producto", FormMethod.Post))
+@using (Html.BeginForm("Agregar", "Producto", FormMethod.Post, new { enctype = "multipart/form-data" }))
 {
     <div class="modal-body">
         <div class="mb-2">
-            @Html.LabelFor(m => m.prod_nombre, "Nombre", new { @class = "form-label" })
-            @Html.TextBoxFor(m => m.prod_nombre, new { @class = "form-control", required = "required" })
+            @Html.LabelFor(m => m.prod_nombre, "Nombre", new { @class = "form-label text-dark fw-semibold" })
+            <div class="input-group">
+                @Html.TextBoxFor(m => m.prod_nombre, new { @class = "form-control", required = "required" })
+                <span class="input-group-text"><i class="bi bi-tag"></i></span>
+            </div>
         </div>
         <div class="mb-2">
-            @Html.LabelFor(m => m.prod_descripcion, "Descripción", new { @class = "form-label" })
-            @Html.TextBoxFor(m => m.prod_descripcion, new { @class = "form-control" })
-        </div>
-        <div class="mb-2">
-            @Html.LabelFor(m => m.prod_codigoBarras, "Código de barras", new { @class = "form-label" })
-            @Html.TextBoxFor(m => m.prod_codigoBarras, new { @class = "form-control" })
+            @Html.LabelFor(m => m.prod_codigoBarras, "Código de barras", new { @class = "form-label text-dark fw-semibold" })
+            <div class="input-group">
+                @Html.TextBoxFor(m => m.prod_codigoBarras, new { @class = "form-control" })
+                <span class="input-group-text"><i class="bi bi-upc-scan"></i></span>
+            </div>
         </div>
         <div class="row g-2 mb-2">
             <div class="col">
-                @Html.LabelFor(m => m.prod_precio, "Precio", new { @class = "form-label" })
-                @Html.TextBoxFor(m => m.prod_precio, new { @class = "form-control", type = "number", step = "0.01" })
+                @Html.LabelFor(m => m.prod_costo, "Costo", new { @class = "form-label text-dark fw-semibold" })
+                <div class="input-group">
+                    @Html.TextBox("prod_costo", "", new { @class = "form-control", type = "number", step = "0.01", placeholder = "0.00", required = "required" })
+                    <span class="input-group-text">$</span>
+                </div>
             </div>
             <div class="col">
-                @Html.LabelFor(m => m.prod_costo, "Costo", new { @class = "form-label" })
-                @Html.TextBoxFor(m => m.prod_costo, new { @class = "form-control", type = "number", step = "0.01" })
+                @Html.LabelFor(m => m.prod_precio, "Precio", new { @class = "form-label text-dark fw-semibold" })
+                <div class="input-group">
+                    @Html.TextBox("prod_precio", "", new { @class = "form-control", type = "number", step = "0.01", placeholder = "0.00", required = "required" })
+                    <span class="input-group-text">$</span>
+                </div>
             </div>
             <div class="col">
-                @Html.LabelFor(m => m.prod_stock, "Stock", new { @class = "form-label" })
-                @Html.TextBoxFor(m => m.prod_stock, new { @class = "form-control", type = "number", step = "0.01" })
+                @Html.LabelFor(m => m.prod_stock, "Stock", new { @class = "form-label text-dark fw-semibold" })
+                <div class="input-group">
+                    @Html.TextBox("prod_stock", "", new { @class = "form-control", type = "number", step = "0.01", placeholder = "0", required = "required" })
+                    <span class="input-group-text"><i class="bi bi-box-seam"></i></span>
+                </div>
             </div>
-        </div>
-        <div class="mb-2">
-            @Html.LabelFor(m => m.prod_imagen, "Imagen (nombre del archivo)", new { @class = "form-label" })
-            @Html.TextBoxFor(m => m.prod_imagen, new { @class = "form-control", placeholder = "leche.jpg" })
         </div>
         <div class="row g-2">
             <div class="col">
-                @Html.LabelFor(m => m.prod_categoria!.cat_id, "Categoría", new { @class = "form-label" })
-                @Html.DropDownListFor(m => m.prod_categoria!.cat_id, (SelectList)ViewBag.Categorias, "Seleccione", new { @class = "form-select" })
+                @Html.LabelFor(m => m.prod_contenido, "Contenido", new { @class = "form-label text-dark fw-semibold" })
+                <div class="input-group">
+                    @Html.TextBox("prod_contenido", "", new { @class = "form-control", type = "number", step = "0.01", placeholder = "0", required = "required" })
+                    <span class="input-group-text"><i class="bi bi-rulers"></i></span>
+                </div>
             </div>
             <div class="col">
-                @Html.LabelFor(m => m.prod_marca!.mar_id, "Marca", new { @class = "form-label" })
-                @Html.DropDownListFor(m => m.prod_marca!.mar_id, (SelectList)ViewBag.Marcas, "Seleccione", new { @class = "form-select" })
+                @Html.LabelFor(m => m.prod_unidad!.uni_id, "Unidad", new { @class = "form-label text-dark fw-semibold" })
+                @Html.DropDownListFor(m => m.prod_unidad!.uni_id, (SelectList)ViewBag.Unidades, "Seleccione", new { @class = "form-select " })
+            </div>
+        </div>
+        <div class="mb-2">
+            <label class="form-label text-dark fw-semibold">Imagen del producto</label>
+            <div id="zonaImagen" class="zona-imagen text-center p-4">
+                <i id="iconoImagen" class="bi bi-image fs-1 text-secondary"></i>
+                <img id="vistaPrevia" class="d-none mx-auto" alt="Vista previa" />
+                <p class="fw-semibold mb-0 mt-2">Arrastra una imagen aquí</p>
+                <small class="text-muted">o haz clic para seleccionar</small>
+                <div class="mt-2">
+                    <span class="btn btn-outline-success btn-sm">
+                        <i class="bi bi-folder2-open me-1"></i>Seleccionar archivo
+                    </span>
+                </div>
+            </div>
+            <input type="file" name="imagen" id="inputImagen" accept=".jpg,.jpeg,.png,.webp" class="d-none" />
+        </div>
+        <div class="row g-2">
+            <div class="col">
+                @Html.LabelFor(m => m.prod_categoria!.cat_id, "Categoría", new { @class = "form-label text-dark fw-semibold" })
+                @Html.DropDownListFor(m => m.prod_categoria!.cat_id, (SelectList)ViewBag.Categorias, "Seleccione", new { @class = "form-select " })
+            </div>
+            <div class="col">
+                @Html.LabelFor(m => m.prod_marca!.mar_id, "Marca", new { @class = "form-label text-dark fw-semibold" })
+                @Html.DropDownListFor(m => m.prod_marca!.mar_id, (SelectList)ViewBag.Marcas, "Seleccione", new { @class = "form-select " })
+            </div>
+        </div>
+        <div class="row g-2">
+            <div class="col">
+                @Html.LabelFor(m => m.prod_proveedor!.pro_id, "Proveedor", new { @class = "form-label text-dark fw-semibold" })
+                @Html.DropDownListFor(m => m.prod_proveedor!.pro_id, (SelectList)ViewBag.Proveedores, "Seleccione", new { @class = "form-select" })
+            </div>
+            <div class="col">
+                @Html.LabelFor(m => m.prod_activo!.act_id, "Estado", new { @class = "form-label text-dark fw-semibold" })
+                @Html.DropDownListFor(m => m.prod_activo!.act_id, (SelectList)ViewBag.Estados, new { @class = "form-select " })
             </div>
         </div>
     </div>
-    <div class="modal-footer">
+    <div class="modal-footer border-0">
         <button type="button" class="btn btn-danger" data-bs-dismiss="modal">Cancelar</button>
         <button type="submit" class="btn btn-success">Guardar</button>
     </div>
 }
+
+
+<script>
+    const zona = document.getElementById('zonaImagen');
+    const input = document.getElementById('inputImagen');
+    const vista = document.getElementById('vistaPrevia');
+    const icono = document.getElementById('iconoImagen');
+
+    function mostrar(archivo) {
+        if (!archivo || !archivo.type.startsWith('image/')) return;
+        vista.src = URL.createObjectURL(archivo);
+        vista.classList.remove('d-none');
+        icono.classList.add('d-none');
+    }
+
+    zona.addEventListener('click', () => input.click());
+    input.addEventListener('change', () => mostrar(input.files[0]));
+
+    ['dragenter', 'dragover'].forEach(e =>
+        zona.addEventListener(e, ev => { ev.preventDefault(); zona.classList.add('arrastrando'); }));
+    ['dragleave', 'drop'].forEach(e =>
+        zona.addEventListener(e, ev => { ev.preventDefault(); zona.classList.remove('arrastrando'); }));
+
+    zona.addEventListener('drop', ev => {
+        input.files = ev.dataTransfer.files;
+        mostrar(input.files[0]);
+    });
+</script>
