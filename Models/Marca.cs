@@ -1,5 +1,4 @@
 using Microsoft.Data.SqlClient;
-
 namespace Inventario.Models;
 
 public class Marca : ConsultaBase

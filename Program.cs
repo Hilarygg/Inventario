@@ -5,6 +5,7 @@ var builder = WebApplication.CreateBuilder(args);
 // Add services to the container.
 builder.Services.AddControllersWithViews();
 builder.Services.AddAuthentication("Cookies").AddCookie("Cookies", o => o.LoginPath = "/Login");
+builder.Services.AddScoped<Inventario.Services.ImagenService>();
 
 var app = builder.Build();
 

@@ -130,4 +130,90 @@ public class Producto : ConsultaBase
 
         return ExecutedCommand(query, parameters);
     }
+
+    public Producto ObtenerProducto(int prod_id)
+    {
+        string query = @"SELECT p.prod_id, p.prod_imagen, p.prod_nombre, p.prod_contenido, u.uni_id, u.uni_abreviatura, p.prod_precioventa,
+                m.mar_id, m.mar_nombre, c.cat_id, c.cat_nombre,
+                p.prod_codigoBarras, p.prod_stockMinimo, a.act_id, a.act_nombre, pr.pro_id, pr.pro_nombre
+         FROM Producto p
+         INNER JOIN Marca m ON p.prod_marca = m.mar_id
+         INNER JOIN Categoria c ON p.prod_categoria = c.cat_id
+         INNER JOIN Activo a ON p.prod_activo = a.act_id
+         INNER JOIN UnidadMedida u ON p.prod_unidad = u.uni_id
+         INNER JOIN Proveedor pr ON p.prod_proveedor = pr.pro_id
+         WHERE p.prod_id = @Id";
+
+         Dictionary<string, dynamic> parametros = new Dictionary<string, dynamic>()
+         {
+            { "@Id", prod_id }
+         };
+
+         SqlDataReader reader = null!;
+         Producto producto = new Producto();
+         ConsultaDB(ref reader, query, parametros);
+
+         if(reader.Read())
+         {
+            producto.prod_id = reader.GetInt32(0);
+            producto.prod_imagen = reader.IsDBNull(1) ? "" : reader.GetString(1);
+            producto.prod_nombre = reader.GetString(2);
+            producto.prod_contenido = reader.GetInt32(3);
+            producto.prod_unidad = new Unidad()
+            {
+                uni_id = reader.GetInt32(4),
+                uni_abreviatura = reader.GetString(5)
+            };
+            producto.prod_precio = reader.GetDecimal(6);
+            producto.prod_marca = new Marca()
+            {
+                mar_id = reader.GetInt32(7),
+                mar_nombre = reader.GetString(8)
+            };
+            producto.prod_categoria = new Categoria()
+            { 
+                cat_id = reader.GetInt32(9), 
+                cat_nombre = reader.GetString(10),
+            };
+            producto.prod_codigoBarras = reader.GetString(11);
+            producto.prod_stock = reader.GetDecimal(12);
+            producto.prod_activo = new Activo()
+            {
+                act_id = reader.GetInt32(13),
+                act_nombre = reader.GetString(14)
+            };
+            producto.prod_proveedor = new Proveedor()
+            {
+                pro_id = reader.GetInt32(15),
+                pro_nombre = reader.GetString(16)
+            };
+            reader.Close();
+         }
+         return producto;
+    }
+
+    public bool ActualizarProducto()
+    {
+        string query = @"UPDATE Producto SET prod_nombre = @Nombre, prod_codigoBarras = @CodigoBarras, prod_precioventa = @Precio, prod_stockMinimo = @Stock, prod_imagen = @Imagen, prod_costoactual = @Costo, prod_contenido = @Contenido, prod_activo = @Activo, prod_categoria = @CategoriaId, prod_marca = @MarcaId, prod_proveedor = @ProveedorId, prod_unidad = @UnidadId
+                        WHERE prod_id = @Id";
+
+        Dictionary<string, object?> parameters = new Dictionary<string, object?>()
+        {
+            { "@Nombre", prod_nombre },
+            { "@CodigoBarras", prod_codigoBarras ?? "" },
+            { "@Precio", prod_precio },
+            { "@Stock", prod_stock },
+            { "@Imagen", prod_imagen ?? "" },
+            { "@Costo", prod_costo },
+            { "@Contenido", prod_contenido },
+            { "@Activo", prod_activo?.act_id },
+            { "@CategoriaId", prod_categoria?.cat_id },
+            { "@MarcaId", prod_marca?.mar_id },
+            { "@ProveedorId", prod_proveedor?.pro_id },
+            { "@UnidadId", prod_unidad?.uni_id },
+            { "@Id", prod_id }
+        };
+
+        return ExecutedCommand(query, parameters);
+    }
 }

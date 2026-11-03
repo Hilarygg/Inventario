@@ -13,7 +13,7 @@
         <div class="mb-2">
             @Html.LabelFor(m => m.prod_codigoBarras, "Código de barras", new { @class = "form-label text-dark fw-semibold" })
             <div class="input-group">
-                @Html.TextBoxFor(m => m.prod_codigoBarras, new { @class = "form-control" })
+                @Html.TextBoxFor(m => m.prod_codigoBarras, new { @class = "form-control", required = "required" })
                 <span class="input-group-text"><i class="bi bi-upc-scan"></i></span>
             </div>
         </div>
@@ -50,7 +50,7 @@
             </div>
             <div class="col">
                 @Html.LabelFor(m => m.prod_unidad!.uni_id, "Unidad", new { @class = "form-label text-dark fw-semibold" })
-                @Html.DropDownListFor(m => m.prod_unidad!.uni_id, (SelectList)ViewBag.Unidades, "Seleccione", new { @class = "form-select " })
+                @Html.DropDownListFor(m => m.prod_unidad!.uni_id, (SelectList)ViewBag.Unidades, "Seleccione", new { @class = "form-select", required = "required" })
             </div>
         </div>
         <div class="mb-2">
@@ -71,21 +71,21 @@
         <div class="row g-2">
             <div class="col">
                 @Html.LabelFor(m => m.prod_categoria!.cat_id, "Categoría", new { @class = "form-label text-dark fw-semibold" })
-                @Html.DropDownListFor(m => m.prod_categoria!.cat_id, (SelectList)ViewBag.Categorias, "Seleccione", new { @class = "form-select " })
+                @Html.DropDownListFor(m => m.prod_categoria!.cat_id, (SelectList)ViewBag.Categorias, "Seleccione", new { @class = "form-select", required = "required" })
             </div>
             <div class="col">
                 @Html.LabelFor(m => m.prod_marca!.mar_id, "Marca", new { @class = "form-label text-dark fw-semibold" })
-                @Html.DropDownListFor(m => m.prod_marca!.mar_id, (SelectList)ViewBag.Marcas, "Seleccione", new { @class = "form-select " })
+                @Html.DropDownListFor(m => m.prod_marca!.mar_id, (SelectList)ViewBag.Marcas, "Seleccione", new { @class = "form-select", required = "required" })
             </div>
         </div>
         <div class="row g-2">
             <div class="col">
                 @Html.LabelFor(m => m.prod_proveedor!.pro_id, "Proveedor", new { @class = "form-label text-dark fw-semibold" })
-                @Html.DropDownListFor(m => m.prod_proveedor!.pro_id, (SelectList)ViewBag.Proveedores, "Seleccione", new { @class = "form-select" })
+                @Html.DropDownListFor(m => m.prod_proveedor!.pro_id, (SelectList)ViewBag.Proveedores, "Seleccione", new { @class = "form-select", requqired = "required" })
             </div>
             <div class="col">
                 @Html.LabelFor(m => m.prod_activo!.act_id, "Estado", new { @class = "form-label text-dark fw-semibold" })
-                @Html.DropDownListFor(m => m.prod_activo!.act_id, (SelectList)ViewBag.Estados, new { @class = "form-select " })
+                @Html.DropDownListFor(m => m.prod_activo!.act_id, (SelectList)ViewBag.Estados, new { @class = "form-select"})
             </div>
         </div>
     </div>

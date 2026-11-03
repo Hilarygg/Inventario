@@ -2,6 +2,19 @@
 
 @{ ViewData["Title"] = "Productos"; }
 
+@if (TempData["Exito"] != null)
+{
+    <div class="alert alert-success alert-dismissible fade show" role="alert">
+        <i class="bi bi-check-circle-fill me-2"></i>@TempData["Exito"]
+    </div>
+}
+@if (TempData["Error"] != null)
+{
+    <div class="alert alert-danger alert-dismissible fade show" role="alert">
+        <i class="bi bi-exclamation-triangle-fill me-2"></i>@TempData["Error"]
+    </div>
+}
+
 <nav aria-label="breadcrumb">
     <ol class="breadcrumb">
         <li class="breadcrumb-item">
@@ -81,10 +94,11 @@
                         @p.prod_activo?.act_nombre
                     </span>
                 </td>
-                <td>
-                    <a class="btn btn-naranja btn-sm" href="@Url.Action("Editar", "Producto", new { id = p.prod_id })">
-                        <i class="bi bi-pencil me-1"></i>Modificar
-                    </a>
+               <td>
+                    <button type="button" class="btn btn-naranja" onclick="abrirModificar(@p.prod_id)">
+                        <span class="btn-modificar-icono"><i class="bi bi-pencil-fill"></i></span>
+                        Modificar
+                    </button>
                 </td>
             </tr>
         }
@@ -102,3 +116,32 @@
         </div>
     </div>
 </div>
+
+<div class="modal fade" id="ModificarProducto" tabindex="-1" aria-hidden="true" data-bs-backdrop="static" data-bs-keyboard="false">
+    <div class="modal-dialog modal-lg">
+        <div class="modal-content">
+            <div class="modal-header bg-success text-white justify-content-center">
+                <h5 class="modal-title">Actualizar producto</h5>
+            </div>
+            <div id="contenidoModificar"></div>
+        </div>
+    </div>
+</div>
+
+@section Scripts {
+<script>
+    async function abrirModificar(id) {
+        const r = await fetch('@Url.Action("Modificar", "Producto")?id=' + id);
+        document.getElementById('contenidoModificar').innerHTML = await r.text();
+        new bootstrap.Modal(document.getElementById('ModificarProducto')).show();
+    }
+
+    function previsualizar(input) {
+        if (input.files[0])
+            document.getElementById('vistaPreviaEdit').src = URL.createObjectURL(input.files[0]);
+    }
+
+    setTimeout(() => document.querySelectorAll('.alert').forEach(a =>
+    bootstrap.Alert.getOrCreateInstance(a).close()), 4000);
+</script>
+}
