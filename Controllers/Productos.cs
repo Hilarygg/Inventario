@@ -86,4 +86,25 @@ public class ProductoController : Controller
 
         return RedirectToAction("Index");
     }
+
+    public IActionResult Precios(int? categoria, string buscar, string orden)
+    {
+        List<Producto> productos;
+
+        productos = new Producto().BuscarPrecios(buscar, categoria, orden);
+
+        ViewBag.Categorias = new Categoria().MostrarCategoriasPublico();
+        ViewBag.CategoriaActual = categoria;
+        ViewBag.Buscar = buscar;
+        ViewBag.Orden = orden;
+
+        return View(productos);
+    }
+
+    public IActionResult BuscarProductos(string busqueda, int? categoria, string orden)
+    {
+        var productos = new Producto().BuscarPrecios(busqueda, categoria, orden);
+
+        return PartialView("_ListaProductos", productos);
+    }
 }

@@ -1,0 +1,187 @@
+
+@model List<Inventario.Models.Producto>
+
+@{
+    ViewData["Title"] = "Productos";
+
+    var categorias = ViewBag.Categorias as IEnumerable<Inventario.Models.Categoria>
+                     ?? Enumerable.Empty<Inventario.Models.Categoria>();
+
+    int? catActual = ViewBag.CategoriaActual;
+}
+
+<div class="consulta">
+
+    <div class="consulta-contenido">
+        <div class="container-fluid px-5">
+            <p class="fw-bold" style="margin-bottom: -0.1rem;">
+                <img src="~/Images/hoja.png" alt="" class="me-1" style="height: 1.2em;" />
+                Productos de calidad
+            </p>
+
+            <h1 class="fw-bold" style="font-size: 4rem; line-height: 1.2;">
+                Nuestros <span class="verde">productos</span>
+            </h1>
+
+            <p class="my-4" style="font-size: 1.2rem; line-height: 1.5rem; font-family: 'Poppins', sans-serif;">
+                Encuentra todo lo que necesitas, con la mejor calidad
+                y al mejor precio.
+            </p>
+        </div>
+    </div>
+
+    <div class="consulta-imagen">
+        <img src="~/Images/Banner_consulta.png"
+             alt="Productos de SuperCampestre">
+    </div>
+
+</div>
+
+<div class="row g-4">
+
+    <div class="col-lg-2">
+        <div class="card p-2">
+
+            <a class="cat-link @(catActual == null ? "activa" : "")"
+               href="@Url.Action("Precios", "Producto")">
+                <i class="bi bi-grid me-2"></i>Todos los productos
+            </a>
+
+            @foreach (var c in categorias)
+            {
+                <a class="cat-link @(catActual == c.cat_id ? "activa" : "")"
+                   href="@Url.Action("Precios", "Producto", new { categoria = c.cat_id })">
+                    <i class="bi bi-tag me-2"></i>@c.cat_nombre
+                </a>
+            }
+
+        </div>
+    </div>
+
+    <div class="col-lg-10">
+
+        @using (Html.BeginForm("Precios", "Producto", FormMethod.Get, new { @class = "row g-2 mb-4" }))
+        {
+            @Html.Hidden("categoria", catActual)
+
+            <div class="col">
+                <div class="input-group">
+                    <span class="input-group-text bg-white">
+                        <i class="bi bi-search"></i>
+                    </span>
+
+                    @Html.TextBox("buscar", (string)ViewBag.Buscar, new
+                    {
+                        @class = "form-control",
+                        placeholder = "Buscar productos...",
+                        id = "buscador"
+                    })
+                </div>
+            </div>
+
+            <div class="col-auto">
+                <select name="orden" class="form-select" onchange="this.form.submit()">
+
+                    <option value="nombre" selected="@(ViewBag.Orden == "nombre")">
+                        Nombre
+                    </option>
+
+                    <option value="menor" selected="@(ViewBag.Orden == "menor")">
+                        Precio: menor a mayor
+                    </option>
+
+                    <option value="mayor" selected="@(ViewBag.Orden == "mayor")">
+                        Precio: mayor a menor
+                    </option>
+                </select>
+            </div>
+        }
+
+        <!-- Contenedor que se actualizará con los resultados -->
+        <div id="listaProductos">
+
+            <div class="row row-cols-2 row-cols-md-3 row-cols-xl-5 g-3">
+
+                @foreach (var p in Model)
+                {
+                    <div class="col">
+                        <div class="card tarjeta-producto h-100 text-center p-3">
+
+                            @if (!string.IsNullOrEmpty(p.prod_imagen))
+                            {
+                                <img src="/Images/Productos/@p.prod_imagen"
+                                     alt="@p.prod_nombre"
+                                     class="img-tarjeta mx-auto" />
+                            }
+                            else
+                            {
+                                <i class="bi bi-image text-secondary img-tarjeta-vacia"></i>
+                            }
+
+                            <h6 class="mt-2 mb-1">@p.prod_nombre</h6>
+
+                            <div class="precio-tarjeta">
+                                @p.prod_precio.ToString("C")
+                                <small>@p.prod_unidad?.uni_abreviatura</small>
+                            </div>
+
+                            <div class="my-2">
+                                <span class="badge rounded-pill text-bg-success">
+                                    En stock
+                                </span>
+                            </div>
+                        </div>
+                    </div>
+                }
+
+                @if (!Model.Any())
+                {
+                    <div class="col-12 text-center text-muted py-4">
+                        No se encontraron productos.
+                    </div>
+                }
+
+            </div>
+
+        </div>
+
+    </div>
+</div>
+
+<script>
+    const buscador = document.getElementById("buscador");
+    const listaProductos = document.getElementById("listaProductos");
+
+    let temporizador;
+
+    buscador.addEventListener("input", function () {
+
+        clearTimeout(temporizador);
+
+        temporizador = setTimeout(async function () {
+
+            const url = '@Url.Action("BuscarProductos", "Producto")';
+
+            const parametros = new URLSearchParams({
+                busqueda: buscador.value,
+                categoria: '@(ViewBag.CategoriaActual ?? "")'
+            });
+
+            try {
+                const respuesta = await fetch(`${url}?${parametros}`);
+
+                if (!respuesta.ok) {
+                    throw new Error("No se pudieron obtener los productos.");
+                }
+
+                const html = await respuesta.text();
+
+                listaProductos.innerHTML = html;
+            }
+            catch (error) {
+                console.error("Error al buscar productos:", error);
+            }
+
+        }, 300);
+    });
+</script>

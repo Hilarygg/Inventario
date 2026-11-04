@@ -1,0 +1,39 @@
+@model List<Inventario.Models.Producto>
+
+<div class="row row-cols-2 row-cols-md-3 row-cols-xl-5 g-3">
+    @foreach (var p in Model)
+    {
+        <div class="col">
+            <div class="card tarjeta-producto h-100 text-center p-3">
+
+                @if (!string.IsNullOrEmpty(p.prod_imagen))
+                {
+                    <img src="/Images/Productos/@p.prod_imagen" alt="@p.prod_nombre" class="img-tarjeta mx-auto" />
+                }
+                else
+                {
+                    <i class="bi bi-image text-secondary img-tarjeta-vacia"></i>
+                }
+
+                <h6 class="mt-2 mb-1">@p.prod_nombre</h6>
+
+                <div class="precio-tarjeta">
+                    @p.prod_precio.ToString("C")
+                    <small>@p.prod_unidad?.uni_abreviatura</small>
+                </div>
+
+                <div class="my-2">
+                    <span class="badge rounded-pill text-bg-success">En stock</span>
+                </div>
+
+                <button type="button" class="btn btn-verde btn-sm w-100 mt-auto">Ver detalles</button>
+
+            </div>
+        </div>
+    }
+</div>
+
+@if (!Model.Any())
+{
+    <div class="text-center text-muted py-4">No se encontraron productos.</div>
+}

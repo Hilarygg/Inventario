@@ -106,6 +106,45 @@ public class Producto : ConsultaBase
         return lista;
     }
 
+    public List<Producto> MostrarPrecios(int? categoria_id = null)
+    {
+        string query = @"SELECT p.prod_id, p.prod_imagen, p.prod_nombre, p.prod_precioventa,
+                        m.mar_id, m.mar_nombre, p.prod_categoria
+                 FROM Producto p
+                 INNER JOIN Marca m ON p.prod_marca = m.mar_id
+                 WHERE (@CategoriaId IS NULL OR p.prod_categoria = @CategoriaId)";
+
+        Dictionary<string, dynamic> parameters = new Dictionary<string, dynamic>()
+        {
+            { "CategoriaId", categoria_id.HasValue ? categoria_id.Value : DBNull.Value }
+        };  
+                      
+        SqlDataReader reader = null!;
+        List<Producto> lista = new List<Producto>();
+        ConsultaBase consultaBase = new ConsultaBase();
+        ConsultaDB(ref reader, query, parameters);
+
+        while (reader.Read())
+        {
+            Producto producto = new Producto()
+            {
+                prod_id = reader.GetInt32(0),
+                prod_imagen = reader.GetString(1),
+                prod_nombre = reader.GetString(2),
+                prod_precio = reader.GetDecimal(3),
+                prod_marca = new Marca()
+                {
+                    mar_id = reader.GetInt32(4),
+                    mar_nombre = reader.GetString(5)
+                },
+                prod_categoria = new Categoria { cat_id = reader.GetInt32(6) }
+            };
+            lista.Add(producto);
+        }
+
+        return lista;
+    }
+
     public bool InsertProducto()
     {
         string query = @"INSERT INTO Producto (prod_nombre, prod_codigoBarras, prod_precioventa, prod_stockMinimo, prod_imagen, prod_costoactual, prod_fechaCreacion, prod_contenido, prod_activo, prod_categoria, prod_marca, prod_proveedor, prod_unidad)
@@ -215,5 +254,68 @@ public class Producto : ConsultaBase
         };
 
         return ExecutedCommand(query, parameters);
+    }
+
+    public List<Producto> BuscarPrecios(string busqueda, int? categoria_id, string orden)
+    {
+        string ordenar = orden switch
+        {
+            "nombre" => "p.prod_nombre ASC",
+            "menor" => "p.prod_precioventa ASC",
+            "mayor" => "p.prod_precioventa DESC",
+            _ => "p.prod_nombre ASC"
+        };
+
+        string query = $@"SELECT p.prod_id, p.prod_imagen, p.prod_nombre, p.prod_precioventa,
+                                m.mar_id, m.mar_nombre, p.prod_categoria
+                        FROM Producto p
+                        INNER JOIN Marca m ON p.prod_marca = m.mar_id
+                        WHERE (@CategoriaId IS NULL OR p.prod_categoria = @CategoriaId)
+                        AND (@Busqueda IS NULL OR p.prod_nombre LIKE '%' + @Busqueda + '%'
+                        OR m.mar_nombre LIKE '%' + @Busqueda + '%')
+                        ORDER BY {ordenar}";
+
+        object categoriaParam = categoria_id.HasValue
+            ? (object)categoria_id.Value
+            : DBNull.Value;
+
+        object busquedaParam = string.IsNullOrWhiteSpace(busqueda)
+            ? DBNull.Value
+            : busqueda.Trim();
+
+        Dictionary<string, dynamic> parameters = new Dictionary<string, dynamic>()
+        {
+            { "CategoriaId", categoriaParam },
+            { "Busqueda", busquedaParam }
+        };
+
+        SqlDataReader reader = null!;
+        List<Producto> lista = new List<Producto>();
+
+        ConsultaDB(ref reader, query, parameters);
+
+        while (reader.Read())
+        {
+            Producto producto = new Producto()
+            {
+                prod_id = reader.GetInt32(0),
+                prod_imagen = reader.GetString(1),
+                prod_nombre = reader.GetString(2),
+                prod_precio = reader.GetDecimal(3),
+                prod_marca = new Marca()
+                {
+                    mar_id = reader.GetInt32(4),
+                    mar_nombre = reader.GetString(5)
+                },
+                prod_categoria = new Categoria()
+                {
+                    cat_id = reader.GetInt32(6)
+                }
+            };
+
+            lista.Add(producto);
+        }
+
+        return lista;
     }
 }
