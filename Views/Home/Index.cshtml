@@ -85,7 +85,7 @@
                         para tu hogar y tu familia, con la mejor calidad y los precios <br />
                         mas competitivos.
                     </p>
-                    <a href="#informacion" class="btn btn-orange px-4 py-2"><i class="bi bi-cart3 me-1"></i> Conoce nuestros productos <i class="bi bi-arrow-right"></i></a>
+                    <a href="@Url.Action("Precios", "Producto")"  class="btn btn-orange px-4 py-2"><i class="bi bi-cart3 me-1"></i> Conoce nuestros productos <i class="bi bi-arrow-right"></i></a>
                 </div>
 
             </div>
@@ -108,7 +108,7 @@
             string imagenCategoria = c.cat_imagen ?? "default.jpg";
 
             <div class="col">
-                <a href="@Url.Action("Index", "Producto", new { categoria = c.cat_id })" class="text-decoration-none text-dark">
+                <a href="@Url.Action("Precios", "Producto", new { categoria = c.cat_id })" class="text-decoration-none text-dark">
                     <div class="card card-categoria shadow-sm h-100">
                         <img src="@Url.Content("~/Images/categorias/" + imagenCategoria)" alt="@c.cat_nombre" class="card-img-top">
                         <div class="card-body d-flex align-items-center gap-2 py-3">

@@ -106,45 +106,7 @@ public class Producto : ConsultaBase
         return lista;
     }
 
-    public List<Producto> MostrarPrecios(int? categoria_id = null)
-    {
-        string query = @"SELECT p.prod_id, p.prod_imagen, p.prod_nombre, p.prod_precioventa,
-                        m.mar_id, m.mar_nombre, p.prod_categoria
-                 FROM Producto p
-                 INNER JOIN Marca m ON p.prod_marca = m.mar_id
-                 WHERE (@CategoriaId IS NULL OR p.prod_categoria = @CategoriaId)";
-
-        Dictionary<string, dynamic> parameters = new Dictionary<string, dynamic>()
-        {
-            { "CategoriaId", categoria_id.HasValue ? categoria_id.Value : DBNull.Value }
-        };  
-                      
-        SqlDataReader reader = null!;
-        List<Producto> lista = new List<Producto>();
-        ConsultaBase consultaBase = new ConsultaBase();
-        ConsultaDB(ref reader, query, parameters);
-
-        while (reader.Read())
-        {
-            Producto producto = new Producto()
-            {
-                prod_id = reader.GetInt32(0),
-                prod_imagen = reader.GetString(1),
-                prod_nombre = reader.GetString(2),
-                prod_precio = reader.GetDecimal(3),
-                prod_marca = new Marca()
-                {
-                    mar_id = reader.GetInt32(4),
-                    mar_nombre = reader.GetString(5)
-                },
-                prod_categoria = new Categoria { cat_id = reader.GetInt32(6) }
-            };
-            lista.Add(producto);
-        }
-
-        return lista;
-    }
-
+    
     public bool InsertProducto()
     {
         string query = @"INSERT INTO Producto (prod_nombre, prod_codigoBarras, prod_precioventa, prod_stockMinimo, prod_imagen, prod_costoactual, prod_fechaCreacion, prod_contenido, prod_activo, prod_categoria, prod_marca, prod_proveedor, prod_unidad)
@@ -267,9 +229,10 @@ public class Producto : ConsultaBase
         };
 
         string query = $@"SELECT p.prod_id, p.prod_imagen, p.prod_nombre, p.prod_precioventa,
-                                m.mar_id, m.mar_nombre, p.prod_categoria
+                                m.mar_id, m.mar_nombre, p.prod_categoria, p.prod_contenido, u.uni_id, u.uni_abreviatura
                         FROM Producto p
                         INNER JOIN Marca m ON p.prod_marca = m.mar_id
+                        INNER JOIN UnidadMedida u ON p.prod_unidad = u.uni_id
                         WHERE (@CategoriaId IS NULL OR p.prod_categoria = @CategoriaId)
                         AND (@Busqueda IS NULL OR p.prod_nombre LIKE '%' + @Busqueda + '%'
                         OR m.mar_nombre LIKE '%' + @Busqueda + '%')
@@ -310,6 +273,12 @@ public class Producto : ConsultaBase
                 prod_categoria = new Categoria()
                 {
                     cat_id = reader.GetInt32(6)
+                },
+                prod_contenido = reader.GetInt32(7),
+                prod_unidad = new Unidad()
+                {
+                    uni_id = reader.GetInt32(8),
+                    uni_abreviatura = reader.GetString(9)
                 }
             };
 

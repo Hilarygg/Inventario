@@ -1,0 +1,44 @@
+@{
+    ViewData["Title"] = "CategoriasPublico";
+    var categorias = ViewBag.Categorias as IEnumerable<Inventario.Models.Categoria>
+                     ?? Enumerable.Empty<Inventario.Models.Categoria>();
+}
+
+<div class="consulta catalogos">
+    <div class="consulta-contenido">
+        <div class="container-fluid px-5">
+            <img src="~/Images/hoja.png" alt="" style="height: 20px; margin-bottom: 10px;" />
+            <strong class="verde">Calidad y ahorro en un solo lugar</strong><br />
+            <h1 class="fw-bold" style="font-size: 3.5rem; line-height: 1.1;">
+                Explora nuestros <br /><span class="verde">catálogos</span>
+            </h1>
+            <p class="my-3" style="font-size: 1.2rem;">
+                Encuentra y conoce toda nuestra variedad de productos.
+            </p>
+        </div>
+    </div>
+    <div class="consulta-imagen">
+        <img src="~/Images/Banner_consulta.png" alt="Catálogos de SuperCampestre" />
+    </div>
+</div>
+
+<div class="row g-3 mb-3">
+    @foreach (var c in categorias)
+    {
+        <div class="col-lg-3 col-md-6">
+            <div class="card tarjeta-catalogo h-100">
+                <div class="d-flex align-items-center gap-3 p-3">
+                    <img src="/Images/Catalogos/@c.cat_imagen" alt="@c.cat_nombre" class="img-catalogo" />
+                    <div class="border-start ps-3 flex-grow-1">
+                        <h5 class="fw-bold titulo-catalogo">@c.cat_nombre</h5>
+                        <p class="text-muted small mb-2">@c.cat_descripcion</p>
+                        <a class="btn btn-verde btn-sm rounded-pill px-3"
+                            href="@Url.Action("Precios", "Producto", new { categoria = c.cat_id })">
+                            Ver catálogo <i class="bi bi-arrow-right ms-1"></i>
+                        </a>
+                    </div>
+                </div>
+            </div>
+        </div>
+    }
+</div>

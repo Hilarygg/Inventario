@@ -18,12 +18,6 @@ public class HomeController : Controller
         return View();
     }
 
-    public IActionResult Categorias()
-    {
-        Categoria categoria = new Categoria();
-        return View(categoria.MostrarCategoriasPublico());
-    }
-
     public IActionResult Nosotros()
     {
         return View();
