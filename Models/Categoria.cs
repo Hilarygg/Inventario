@@ -53,4 +53,48 @@ public class Categoria : ConsultaBase
 
         return lista;
     }
+
+    public List<Categoria> MostrarCategoriasAdmin()
+    {
+        string query = @"SELECT c.cat_id, c.cat_nombre, c.cat_imagen, c.cat_descripcion, a.act_id, a.act_nombre FROM Categoria c 
+                         JOIN Activo a ON c.cat_activo = a.act_id";
+
+        SqlDataReader reader = null!;
+        List<Categoria> lista = new List<Categoria>();
+        ConsultaDB(ref reader, query);
+
+        while (reader.Read())
+        {
+            lista.Add(new Categoria
+            {
+                cat_id = reader.GetInt32(0),
+                cat_nombre = reader.GetString(1),
+                cat_imagen = reader.IsDBNull(2) ? null : reader.GetString(2),
+                cat_descripcion = reader.IsDBNull(3) ? null : reader.GetString(3),
+                cat_activo = new Activo
+                {
+                    act_id = reader.GetInt32(4),
+                    act_nombre = reader.GetString(5)
+                }
+            });
+        }
+
+        return lista;
+    }
+
+    public bool InsertCategoria()
+    {
+        string query = @"Insert into Categoria (cat_nombre, cat_imagen, cat_descripcion, cat_activo)
+                         values (@cat_nombre, @cat_imagen, @cat_descripcion, @cat_activo)";
+
+        Dictionary<string, object?> parametros = new Dictionary<string, object?>()
+        {
+            { "@cat_nombre", cat_nombre },
+            { "@cat_imagen", cat_imagen ?? (object)DBNull.Value },
+            { "@cat_descripcion", cat_descripcion ?? (object)DBNull.Value },
+            { "@cat_activo", cat_activo?.act_id ?? (object)DBNull.Value }
+        };
+
+        return ExecutedCommand(query, parametros);
+    }
 }
