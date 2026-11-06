@@ -41,6 +41,7 @@ public class CatalogosController : Controller
         return View(categorias);
     }
 
+    [HttpPost]
     public IActionResult AgregarCategoria(Categoria categoria, IFormFile? imagen)
     {
         categoria.cat_imagen = _imagen.Guardar(imagen, "Categorias");
@@ -49,6 +50,26 @@ public class CatalogosController : Controller
             TempData["Exito"] = "Categoría agregada correctamente.";
         else
             TempData["Error"] = "No se pudo agregar la categoría.";
+
+        return RedirectToAction("Categorias");
+    }
+
+    public IActionResult ModificarCategoria(int id)
+    {
+        var categoria = new Categoria().ObtenerCategoria(id);
+        ViewBag.Estados = new SelectList(new Activo().MostrarActivos(), "act_id", "act_nombre", categoria.cat_activo?.act_id);
+        return PartialView("ModificarCategoria", categoria);
+    }
+
+    [HttpPost]
+    public IActionResult ModificarCategoria(Categoria categoria, IFormFile? imagen)
+    {
+        categoria.cat_imagen = _imagen.Guardar(imagen, "Categorias", categoria.cat_imagen ?? "");
+
+        if (categoria.ActualizarCategoria())
+            TempData["Exito"] = "Categoría modificada correctamente.";
+        else
+            TempData["Error"] = "No se pudo modificar la categoría.";
 
         return RedirectToAction("Categorias");
     }

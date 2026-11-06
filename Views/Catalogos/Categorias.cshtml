@@ -108,3 +108,35 @@
         </div>
     </div>
 </div>
+
+<div class="modal fade" id="ModificarCategoria" tabindex="-1" aria-hidden="true" data-bs-backdrop="static" data-bs-keyboard="false">
+    <div class="modal-dialog modal-lg">
+        <div class="modal-content">
+            <div class="modal-header bg-success text-white justify-content-center">
+                <h5 class="modal-title">Actualizar categoría</h5>
+            </div>
+            <div id="contenidoModificar"></div>
+        </div>
+    </div>
+</div>
+
+@section Scripts {
+<script>
+    async function abrirModificar(id) {
+        const r = await fetch('@Url.Action("ModificarCategoria", "Catalogos")?id=' + id);
+        document.getElementById('contenidoModificar').innerHTML = await r.text();
+        new bootstrap.Modal(document.getElementById('ModificarCategoria')).show();
+    }
+
+    function previsualizarMod(input) {
+        if (!input.files[0]) return;
+        const v = document.getElementById('vistaPreviaMod');
+        v.src = URL.createObjectURL(input.files[0]);
+        v.classList.remove('d-none');
+        document.getElementById('iconoMod')?.classList.add('d-none');
+    }
+
+    setTimeout(() => document.querySelectorAll('.alert').forEach(a =>
+    bootstrap.Alert.getOrCreateInstance(a).close()), 4000);
+</script>
+}

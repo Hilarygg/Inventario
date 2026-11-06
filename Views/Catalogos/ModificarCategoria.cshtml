@@ -1,0 +1,51 @@
+@model Categoria
+
+@{ Layout = null; }
+
+@using (Html.BeginForm("ModificarCategoria", "Catalogos", FormMethod.Post, new { enctype = "multipart/form-data" }))
+{
+    @Html.HiddenFor(m => m.cat_id)
+    @Html.HiddenFor(m => m.cat_imagen)
+
+    <div class="modal-body">
+        <div class="mb-2">
+            @Html.LabelFor(m => m.cat_nombre, "Nombre", new { @class = "form-label text-dark fw-semibold" })
+            <div class="input-group">
+                @Html.TextBoxFor(m => m.cat_nombre, new { @class = "form-control", required = "required" })
+                <span class="input-group-text"><i class="bi bi-tag"></i></span>
+            </div>
+        </div>
+        <div class="row g-2">
+            <div class="col">
+                @Html.LabelFor(m => m.cat_descripcion, "Descripción", new { @class = "form-label text-dark fw-semibold" })
+                <div class="input-group">
+                    @Html.TextAreaFor(m => m.cat_descripcion, new { @class = "form-control", rows = 3 })
+                </div>
+            </div>
+            <div class="col">
+                @Html.LabelFor(m => m.cat_activo!.act_id, "Estado", new { @class = "form-label text-dark fw-semibold" })
+                @Html.DropDownListFor(m => m.cat_activo!.act_id, (SelectList)ViewBag.Estados, "Seleccione", new { @class = "form-select", required = "required" })
+            </div>
+        </div>
+        <div class="mb-2 mt-2">
+            <label class="form-label text-dark fw-semibold">Imagen de la categoría</label>
+            <div class="zona-imagen text-center p-4" onclick="document.getElementById('inputImagenMod').click()">
+                <img id="vistaPreviaMod"
+                    class="mx-auto @(string.IsNullOrEmpty(Model.cat_imagen) ? "d-none" : "")"
+                    src="@(string.IsNullOrEmpty(Model.cat_imagen) ? "" : "/Images/Catalogos/" + Model.cat_imagen)"
+                    alt="Imagen de la categoría" />
+                <i id="iconoMod" class="bi bi-image fs-1 text-secondary @(string.IsNullOrEmpty(Model.cat_imagen) ? "" : "d-none")"></i>
+                <div class="mt-2">
+                    <span class="btn btn-outline-success btn-sm">
+                        <i class="bi bi-folder2-open me-1"></i>Cambiar imagen
+                    </span>
+                </div>
+            </div>
+            <input type="file" name="imagen" id="inputImagenMod" accept=".jpg,.jpeg,.png,.webp" class="d-none" onchange="previsualizarMod(this)" />
+        </div>
+    </div>
+    <div class="modal-footer border-0">
+        <button type="button" class="btn btn-danger" data-bs-dismiss="modal">Cancelar</button>
+        <button type="submit" class="btn btn-success">Guardar</button>
+    </div>
+}
