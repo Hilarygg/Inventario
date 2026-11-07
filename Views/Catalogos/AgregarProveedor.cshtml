@@ -1,0 +1,38 @@
+@model Proveedor
+
+@using (Html.BeginForm("AgregarProveedor", "Catalogos", FormMethod.Post, new { enctype = "multipart/form-data" }))
+{
+    <div class="modal-body">
+        <div class="mb-2">
+            @Html.LabelFor(p => p.pro_nombre, "Nombre", new { @class = "form-label text-dark fw-semibold" })
+            <div class="input-group">
+                @Html.TextBoxFor(p => p.pro_nombre, new { @class = "form-control", required = "required" })
+                <span class="input-group-text"><i class="bi bi-tag"></i></span>
+            </div>
+            <div class="col">
+                @Html.LabelFor(p => p.pro_correo, "Correo", new { @class = "form-label text-dark fw-semibold" })
+                <div class="input-group">
+                    @Html.TextBoxFor(p => p.pro_correo, new { @class = "form-control", rows = 3 })
+                <span class="input-group-text"><i class="bi bi-envelope"></i></span>
+                </div>
+            </div>
+        </div>
+        <div class="row g-2">
+            <div class="col">
+                @Html.LabelFor(p => p.pro_telefono, "Telefono", new { @class = "form-label text-dark fw-semibold" })
+                <div class="input-group">
+                    @Html.TextBoxFor(p => p.pro_telefono, new { @class = "form-control", rows = 3 })
+                    <span class="input-group-text"><i class="bi bi-telephone"></i></span>
+                </div>
+            </div>
+            <div class="col">
+                @Html.LabelFor(p => p.pro_activo!.act_id, "Estado", new { @class = "form-label text-dark fw-semibold" })
+                @Html.DropDownListFor(p => p.pro_activo!.act_id, (SelectList)ViewBag.Estados, new { @class = "form-select", required = "required" })
+            </div>
+        </div>
+    </div>
+    <div class="modal-footer border-0">
+        <button type="button" class="btn btn-danger" data-bs-dismiss="modal">Cancelar</button>
+        <button type="submit" class="btn btn-success">Guardar</button>
+    </div>
+}

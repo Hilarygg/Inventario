@@ -1,0 +1,163 @@
+@model List<Inventario.Models.Proveedor>
+
+@{
+    ViewData["Title"] = "Proveedores";
+}
+
+@if (TempData["Exito"] != null)
+{
+    <div class="alert alert-success alert-dismissible fade show" role="alert">
+        <i class="bi bi-check-circle-fill me-2"></i>@TempData["Exito"]
+    </div>
+}
+
+@if (TempData["Error"] != null)
+{
+    <div class="alert alert-danger alert-dismissible fade show" role="alert">
+        <i class="bi bi-exclamation-triangle-fill me-2"></i>@TempData["Error"]
+    </div>
+}
+
+<nav aria-label="breadcrumb">
+    <ol class="breadcrumb">
+        <li class="breadcrumb-item">
+            <a href="@Url.Action("Panel", "Home")" class="text-success text-decoration-none">
+                <i class="bi bi-house-fill me-1"></i>Inicio
+            </a>
+        </li>
+        <li class="breadcrumb-item active" aria-current="page">Catalogos</li>
+    </ol>
+</nav>
+
+<div class="d-flex justify-content-between align-items-center mb-4">
+    <div class="d-flex align-items-center gap-3">
+        <img src="/Images/cubo_verde.png" alt="Productos" style="height:60px" />
+        <div>
+            <h1 class="fw-bold mb-0">Proveedores</h1>
+            <p class="text-muted mb-0">Consulta, administra y mantén actualizado el catálogo de proveedores.</p>
+        </div>
+    </div>
+    @using (Html.BeginForm("Crear", "Catalogos", FormMethod.Get, new { @class = "m-0" }))
+    {
+        <button type="button" class="btn-agregar" data-bs-toggle="modal" data-bs-target="#modalProveedor">
+            <span class="btn-agregar-icono"><i class="bi bi-plus-lg"></i></span>
+            Agregar proveedor
+        </button>
+    }
+</div>
+
+@using (Html.BeginForm("Proveedores", "Catalogos", FormMethod.Get, new { @class = "card card-body mb-4" }))
+{
+    <div class="row g-3 align-items-end">
+        <div class="col-md-10">
+            <div class="input-group">
+                @Html.TextBox("buscar", (string)ViewBag.Buscar, new { @class = "form-control", placeholder = "Buscar por nombre, código o proveedor..." })
+                <button class="btn btn-success"><i class="bi bi-search me-1"></i>Buscar</button>
+            </div>
+        </div>
+        <div class="col-md-2">
+            <label class="form-label form-label text-dark fw-semibold">Estado</label>
+            @Html.DropDownList("estado", (SelectList)ViewBag.Estados, new { @class = "form-select", onchange = "this.form.submit()" })
+        </div>
+    </div>
+}
+
+<div class="card">
+    <table class="table table-hover mb-0">
+        <thead class="table-success">
+            <tr>
+                <th style="width: 20%;">Nombre</th>
+                <th style="width: 15%;">Teléfono</th>
+                <th style="width: 25%;">Correo</th>
+                <th style="width: 15%;">Estado</th>
+                <th style="width: 15%;">Acciones</th>
+            </tr>
+        </thead>
+        <tbody>
+            @foreach (var p in Model)
+            {
+                <tr>
+                    <td>@p.pro_nombre</td>
+                    <td>@p.pro_telefono</td>
+                    <td>@p.pro_correo</td>
+                    <td>
+                        <span class="badge rounded-pill @(p.pro_activo?.act_nombre == "Inactivo" ? "text-bg-danger" : "text-bg-success")">
+                            @p.pro_activo?.act_nombre
+                        </span>
+                    </td>
+                    <td class="text-center">
+                        <button type="button" class="btn btn-sm btn-primary me-1" onclick="abrirModificar(@p.pro_id)">
+                            <i class="bi bi-pencil-fill"></i>
+                        </button>
+                        <button type="button" class="btn btn-sm btn-danger" onclick="confirmarEliminar(@p.pro_id)">
+                            <i class="bi bi-trash-fill"></i>
+                        </button>
+                    </td>
+                </tr>
+            }
+        </tbody>
+    </table>
+</div>
+
+<div class="modal fade" id="modalProveedor" tabindex="-1" aria-hidden="true" data-bs-backdrop="static" data-bs-keyboard="false">
+    <div class="modal-dialog modal-lg">
+        <div class="modal-content">
+            <div class="modal-header bg-success text-white justify-content-center">
+                <h5 class="modal-title">Agregar proveedor</h5>
+            </div>
+            @await Html.PartialAsync("AgregarProveedor", new Inventario.Models.Proveedor())
+        </div>
+    </div>
+</div>
+
+<div class="modal fade" id="ModificarProveedor" tabindex="-1" aria-hidden="true" data-bs-backdrop="static" data-bs-keyboard="false">
+    <div class="modal-dialog modal-lg">
+        <div class="modal-content">
+            <div class="modal-header bg-success text-white justify-content-center">
+                <h5 class="modal-title">Actualizar proveedor</h5>
+            </div>
+            <div id="contenidoModificar"></div>
+        </div>
+    </div>
+</div>
+
+<div class="modal fade" id="modalEliminar" tabindex="-1" aria-hidden="true" data-bs-backdrop="static">
+    <div class="modal-dialog modal-dialog-centered">
+        <div class="modal-content">
+            <div class="modal-header bg-danger text-white justify-content-center">
+                <h5 class="modal-title">Eliminar proveedor</h5>
+            </div>
+            @using (Html.BeginForm("EliminarProveedor", "Catalogos", FormMethod.Post))
+            {
+                <input type="hidden" name="id" id="idEliminar" />
+                <div class="modal-body text-center">
+                    <i class="bi bi-exclamation-triangle-fill text-danger fs-1"></i>
+                    <p class="mt-2 mb-0">¿Seguro que quieres eliminar este proveedor?</p>
+                </div>
+                <div class="modal-footer border-0 justify-content-center">
+                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancelar</button>
+                    <button type="submit" class="btn btn-danger">Sí, eliminar</button>
+                </div>
+            }
+        </div>
+    </div>
+</div>
+
+
+@section Scripts {
+<script>
+    async function abrirModificar(id) {
+        const r = await fetch('@Url.Action("ModificarProveedor", "Catalogos")?id=' + id);
+        document.getElementById('contenidoModificar').innerHTML = await r.text();
+        new bootstrap.Modal(document.getElementById('ModificarProveedor')).show();
+    }
+
+    setTimeout(() => document.querySelectorAll('.alert').forEach(a =>
+    bootstrap.Alert.getOrCreateInstance(a).close()), 4000);
+
+   function confirmarEliminar(id) {
+        document.getElementById('idEliminar').value = id;
+        new bootstrap.Modal(document.getElementById('modalEliminar')).show();
+    }
+</script>
+}

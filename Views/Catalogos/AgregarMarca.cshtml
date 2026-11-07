@@ -1,0 +1,52 @@
+@model Marca
+
+@using (Html.BeginForm("AgregarMarca", "Catalogos", FormMethod.Post, new { enctype = "multipart/form-data" }))
+{
+    <div class="modal-body">
+        <div class="mb-2">
+            @Html.LabelFor(m => m.mar_nombre, "Nombre", new { @class = "form-label text-dark fw-semibold" })
+            <div class="input-group">
+                @Html.TextBoxFor(m => m.mar_nombre, new { @class = "form-control", required = "required" })
+                <span class="input-group-text"><i class="bi bi-tag"></i></span>
+            </div>
+        </div>
+        <div class="row g-2">
+            <div class="col">
+                @Html.LabelFor(m => m.mar_activo!.act_id, "Estado", new { @class = "form-label text-dark fw-semibold" })
+                @Html.DropDownListFor(m => m.mar_activo!.act_id, (SelectList)ViewBag.Estados, "Seleccione", new { @class = "form-select", required = "required" })
+            </div>
+        </div>
+    </div>
+    <div class="modal-footer border-0">
+        <button type="button" class="btn btn-danger" data-bs-dismiss="modal">Cancelar</button>
+        <button type="submit" class="btn btn-success">Guardar</button>
+    </div>
+}
+
+
+<script>
+    const zona = document.getElementById('zonaImagen');
+    const input = document.getElementById('inputImagen');
+    const vista = document.getElementById('vistaPrevia');
+    const icono = document.getElementById('iconoImagen');
+
+    function mostrar(archivo) {
+        if (!archivo || !archivo.type.startsWith('image/')) return;
+        vista.src = URL.createObjectURL(archivo);
+        vista.classList.remove('d-none');
+        icono.classList.add('d-none');
+    }
+
+    zona.addEventListener('click', () => input.click());
+    input.addEventListener('change', () => mostrar(input.files[0]));
+
+    ['dragenter', 'dragover'].forEach(e =>
+        zona.addEventListener(e, ev => { ev.preventDefault(); zona.classList.add('arrastrando'); }));
+    ['dragleave', 'drop'].forEach(e =>
+        zona.addEventListener(e, ev => { ev.preventDefault(); zona.classList.remove('arrastrando'); }));
+
+    zona.addEventListener('drop', ev => {
+        input.files = ev.dataTransfer.files;
+        mostrar(input.files[0]);
+    });
+</script>
