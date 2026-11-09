@@ -74,6 +74,25 @@ public class CatalogosController : Controller
         return RedirectToAction("Categorias");
     }
 
+        [HttpPost]
+    public IActionResult EliminarCategoria(int id)
+    {
+        var categoria = new Categoria { cat_id = id };
+
+        if (categoria.ValidarCategoriaInactiva(id))
+            if(categoria.ValidarCategoriaProductos(id))
+                if (categoria.EliminarCategoria(id))
+                TempData["Exito"] = "Categoria eliminada correctamente.";
+                else
+                    TempData["Error"] = "No se pudo eliminar la categoria.";
+            else
+                TempData["Error"] = "No se puede eliminar la marca porque tiene productos asociados.";
+        else
+            TempData["Error"] = "Categoria Activa, no se puede eliminar. Cambie el estado a Inactivo para poder eliminarla.";
+
+        return RedirectToAction("Categorias");
+    }
+
     public IActionResult Marcas(string? buscar, int? estado = 1)
     {
         var marcas = new Marca().MostrarMarcas();

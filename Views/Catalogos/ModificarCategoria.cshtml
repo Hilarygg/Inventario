@@ -24,7 +24,7 @@
             </div>
             <div class="col">
                 @Html.LabelFor(m => m.cat_activo!.act_id, "Estado", new { @class = "form-label text-dark fw-semibold" })
-                @Html.DropDownListFor(m => m.cat_activo!.act_id, (SelectList)ViewBag.Estados, "Seleccione", new { @class = "form-select", required = "required" })
+                @Html.DropDownListFor(m => m.cat_activo!.act_id, (SelectList)ViewBag.Estados, new { @class = "form-select", required = "required" })
             </div>
         </div>
         <div class="mb-2 mt-2">

@@ -140,4 +140,58 @@ public class Categoria : ConsultaBase
 
         return ExecutedCommand(query, parametros);
     }
+
+    public bool EliminarCategoria(int cat_id)
+    {
+        string query = @"DELETE FROM Marca WHERE mar_id = @cat_id";
+
+        Dictionary<string, object?> Parametros = new Dictionary<string, object?>()
+        {
+            {"@mar_id", cat_id}
+        };
+
+        return ExecutedCommand(query, Parametros);
+    }
+
+    public bool ValidarCategoriaInactiva(int cat_id)
+    {
+        string query = @"SELECT COUNT(*)
+                        FROM Categoria c
+                        WHERE c.cat_id = @cat_id
+                        AND c.cat_activo = (SELECT act_id FROM Activo WHERE act_nombre = 'Inactivo')";
+
+        Dictionary<string, object> parameters = new Dictionary<string, object>()
+        {
+            {"@cat_id", cat_id}
+        };
+
+        SqlDataReader reader = null!;
+        ConsultaDB(ref reader, query, parameters);
+
+        bool validar = reader.Read() && reader.GetInt32(0) > 0;
+        reader.Close();
+
+        return validar;
+
+    }
+
+    public bool ValidarCategoriaProductos(int id)
+    {
+        string query = @"SELECT COUNT(*)
+                        FROM Producto p
+                        WHERE p.prod_categoria = @Id";
+
+        Dictionary<string, object> parameters = new Dictionary<string, object>()
+        {
+            {"@Id", id}
+        };
+
+        SqlDataReader reader = null!;
+        ConsultaDB(ref reader, query, parameters);
+
+        bool validar = reader.Read() && reader.GetInt32(0) == 0;
+        reader.Close();
+
+        return validar;
+    }
 }

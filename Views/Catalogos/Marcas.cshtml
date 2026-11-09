@@ -84,7 +84,7 @@
                         <button type="button" class="btn btn-sm btn-primary me-1" onclick="abrirModificar(@m.mar_id)">
                             <i class="bi bi-pencil-fill"></i>
                         </button>
-                        <button type="button" class="btn btn-sm btn-danger" onclick="confirmarEliminar(@m.mar_id)">
+                        <button type="button" class="btn btn-sm btn-danger" onclick="confirmarEliminar(@m.mar_id, '@m.mar_nombre')">
                             <i class="bi bi-trash-fill"></i>
                         </button>
                     </td>
@@ -128,7 +128,7 @@
                 <input type="hidden" name="id" id="idEliminar" />
                 <div class="modal-body text-center">
                     <i class="bi bi-exclamation-triangle-fill text-danger fs-1"></i>
-                    <p class="mt-2 mb-0">¿Seguro que quieres eliminar esta marca?</p>
+                    <p class="mt-2 mb-0">¿Seguro que quieres eliminar a <strong id = "nombreEliminar"></strong></p>
                 </div>
                 <div class="modal-footer border-0 justify-content-center">
                     <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancelar</button>
@@ -151,8 +151,9 @@
     bootstrap.Alert.getOrCreateInstance(a).close()), 4000);
 
     
-   function confirmarEliminar(id) {
+   function confirmarEliminar(id, nombre) {
         document.getElementById('idEliminar').value = id;
+        document.getElementById('nombreEliminar').textContent = nombre;
         new bootstrap.Modal(document.getElementById('modalEliminar')).show();
     }
 </script>
