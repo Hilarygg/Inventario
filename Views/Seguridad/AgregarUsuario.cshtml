@@ -1,0 +1,24 @@
+@model Usuario
+
+@using (Html.BeginForm("AgregarUsuario", "Usuario", FormMethod.Post, new { enctype = "multipart/form-data" }))
+{
+    <div class="modal-body">
+        <div class="mb-2">
+            @Html.LabelFor(u => u.usu_nombre, "Nombre", new { @class = "form-label text-dark fw-semibold" })
+            <div class="input-group">
+                @Html.TextBoxFor(u => u.usu_nombre, new { @class = "form-control", required = "required" })
+                <span class="input-group-text"><i class="bi bi-tag"></i></span>
+            </div>
+        </div>
+        <div class="row g-2">
+            <div class="col">
+                @Html.LabelFor(u => u.usu_activo!.act_id, "Estado", new { @class = "form-label text-dark fw-semibold" })
+                @Html.DropDownListFor(u => u.usu_activo!.act_id, (SelectList)ViewBag.Estados, new { @class = "form-select", required = "required" })
+            </div>
+        </div>
+    </div>
+    <div class="modal-footer border-0">
+        <button type="button" class="btn btn-danger" data-bs-dismiss="modal">Cancelar</button>
+        <button type="submit" class="btn btn-success">Guardar</button>
+    </div>
+}

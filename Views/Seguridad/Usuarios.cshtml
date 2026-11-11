@@ -1,0 +1,125 @@
+@model List<Inventario.Models.Usuario>
+
+@{
+    ViewData["Title"] = "Usuario";
+}
+
+@if (TempData["Exito"] != null)
+{
+    <div class="alert alert-success alert-dismissible fade show" role="alert">
+        <i class="bi bi-check-circle-fill me-2"></i>@TempData["Exito"]
+    </div>
+}
+
+@if (TempData["Error"] != null)
+{
+    <div class="alert alert-danger alert-dismissible fade show" role="alert">
+        <i class="bi bi-exclamation-triangle-fill me-2"></i>@TempData["Error"]
+    </div>
+}
+
+<nav aria-label="breadcrumb">
+    <ol class="breadcrumb">
+        <li class="breadcrumb-item">
+            <a href="@Url.Action("Panel", "Home")" class="text-success text-decoration-none">
+                <i class="bi bi-house-fill me-1"></i>Inicio
+            </a>
+        </li>
+        <li class="breadcrumb-item active" aria-current="page">Seguridad</li>
+    </ol>
+</nav>
+
+<div class="d-flex justify-content-between align-items-center mb-4">
+    <div class="d-flex align-items-center gap-3">
+        <img src="/Images/cubo_verde.png" alt="Productos" style="height:60px" />
+        <div>
+            <h1 class="fw-bold mb-0">Usuarios</h1>
+            <p class="text-muted mb-0">Consulta, administra y mantén actualizado el catálogo de usuarios.</p>
+        </div>
+    </div>
+    @using (Html.BeginForm("Crear", "Seguridad", FormMethod.Get, new { @class = "m-0" }))
+    {
+        <button type="button" class="btn-agregar" data-bs-toggle="modal" data-bs-target="#modalMarca">
+            <span class="btn-agregar-icono"><i class="bi bi-plus-lg"></i></span>
+            Agregar usuario
+        </button>
+    }
+</div>
+
+@using (Html.BeginForm("Usuarios", "Seguridad", FormMethod.Get, new { @class = "card card-body mb-4" }))
+{
+    <div class="row g-3 align-items-end">
+        <div class="col-md-10">
+            <div class="input-group">
+                @Html.TextBox("buscar", (string)ViewBag.Buscar, new { @class = "form-control", placeholder = "Buscar por nombre, código o marca..." })
+                <button class="btn btn-success"><i class="bi bi-search me-1"></i>Buscar</button>
+            </div>
+        </div>
+        <div class="col-md-2">
+            <label class="form-label form-label text-dark fw-semibold">Estado</label>
+            @Html.DropDownList("estado", (SelectList)ViewBag.Estados, new { @class = "form-select", onchange = "this.form.submit()" })
+        </div>
+ 
+   </div>
+}
+
+<div class="card">
+    <table class="table table-hover mb-0">
+        <thead class="table-success">
+            <tr>
+                <th style="width: 5%;">ID</th>
+                <th style="width: 10%">Nombre</th>
+                <th style="width: 10%">Paterno</th>
+                <th style="width: 10%">Materno</th>
+                <th style="width: 10%">Username</th>
+                <th style="width: 10%">Creacion</th>
+                <th style="width: 10%">Activo</th>
+                <th style="width: 10%">Rol</th>
+                <th style="width: 10%">Sucursal</th>
+                <th style="width: 10%">Acciones</th>
+            </tr>
+        </thead>
+        <tbody>
+            @foreach (var u in Model)
+            {
+                <tr>
+                    <td>@u.usu_id</td>
+                    <td>@u.usu_nombre</td>
+                    <td>@u.usu_paterno</td>
+                    <td>@u.usu_materno</td>
+                    <td>@u.usu_username</td>
+                    <td>@u.usu_materno</td>
+                    <td>
+                        <span class="badge rounded-pill @(u.usu_activo?.act_nombre == "Inactivo" ? "text-bg-danger" : "text-bg-success")">
+                            @u.usu_activo?.act_nombre
+                        </span>
+                    </td>   
+                    <td>    
+                        <span class="badge rounded-pill usu-@(u.usu_rol?.rol_id % 6)">@u.usu_rol?.rol_nombre</span>
+                    </td>
+                    <td>@u.usu_sucursal?.suc_nombre</td>
+                    <td class="text-center">
+                        <button type="button" class="btn btn-sm btn-primary me-1" onclick="abrirModificar(@u.usu_id)">
+                            <i class="bi bi-pencil-fill"></i>
+                        </button>
+                        <button type="button" class="btn btn-sm btn-danger" onclick="confirmarEliminar(@u.usu_id, '@u.usu_nombre')">
+                            <i class="bi bi-trash-fill"></i>
+                        </button>
+                    </td>
+                </tr>
+            }
+        </tbody>
+
+    </table>
+</div>
+
+<div class="modal fade" id="modalUsuario" tabindex="-1" aria-hidden="true" data-bs-backdrop="static" data-bs-keyboard="false">
+    <div class="modal-dialog modal-lg">
+        <div class="modal-content">
+            <div class="modal-header bg-success text-white justify-content-center">
+                <h5 class="modal-title">Agregar usuario</h5>
+            </div>
+            @await Html.PartialAsync("AgregarUsuario", new Inventario.Models.Usuario())
+        </div>
+    </div>
+</div>

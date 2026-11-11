@@ -1,4 +1,4 @@
-using Microsoft.AspNetCore.Mvc;
+ using Microsoft.AspNetCore.Mvc;
 using Inventario.Models;
 using Inventario.Services;
 using Microsoft.AspNetCore.Mvc.Rendering;
