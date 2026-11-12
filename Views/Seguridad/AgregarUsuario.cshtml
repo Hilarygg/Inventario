@@ -1,19 +1,66 @@
 @model Usuario
 
-@using (Html.BeginForm("AgregarUsuario", "Usuario", FormMethod.Post, new { enctype = "multipart/form-data" }))
+@using (Html.BeginForm("AgregarUsuario", "Seguridad", FormMethod.Post, new { enctype = "multipart/form-data" }))
 {
     <div class="modal-body">
         <div class="mb-2">
             @Html.LabelFor(u => u.usu_nombre, "Nombre", new { @class = "form-label text-dark fw-semibold" })
             <div class="input-group">
                 @Html.TextBoxFor(u => u.usu_nombre, new { @class = "form-control", required = "required" })
-                <span class="input-group-text"><i class="bi bi-tag"></i></span>
+                <span class="input-group-text"><i class="bi bi-person"></i></span>
+            </div>
+        </div>
+        <div class="row g-2 mb-2">
+            <div class="col">
+                @Html.LabelFor(u => u.usu_paterno, "A. Paterno", new { @class = "form-label text-dark fw-semibold" })
+                <div class="input-group">
+                    @Html.TextBoxFor(u => u.usu_paterno, new { @class = "form-control", required = "required" })
+                    <span class="input-group-text"><i class="bi bi-person-vcard"></i></span>
+                </div>
+            </div>
+            <div class="col">
+                @Html.LabelFor(u => u.usu_materno, "A. Materno", new { @class = "form-label text-dark fw-semibold" })
+                <div class="input-group">
+                    @Html.TextBoxFor(u => u.usu_materno, new { @class = "form-control", required = "required" })
+                    <span class="input-group-text"><i class="bi bi-person-vcard"></i></span>
+                </div>
+            </div>
+        </div>
+        <div class="row g-2 mb-2">
+            <div class="col">
+                @Html.LabelFor(u => u.usu_username, "Usuario", new { @class = "form-label text-dark fw-semibold" })
+                <div class="input-group">
+                    @Html.TextBoxFor(u => u.usu_username, new { @class = "form-control", required = "required" })
+                    <span class="input-group-text"><i class="bi bi-person-circle"></i></span>
+                </div>
+            </div>
+            <div class="col">
+                @Html.LabelFor(u => u.usu_password, "Contrasena", new { @class = "form-label text-dark fw-semibold" })
+                <div class="input-group">
+                    @Html.TextBoxFor(u => u.usu_password, new { @class = "form-control", required = "required" })
+                    <span class="input-group-text"><i class="bi bi-lock"></i></span>
+                </div>
             </div>
         </div>
         <div class="row g-2">
             <div class="col">
                 @Html.LabelFor(u => u.usu_activo!.act_id, "Estado", new { @class = "form-label text-dark fw-semibold" })
                 @Html.DropDownListFor(u => u.usu_activo!.act_id, (SelectList)ViewBag.Estados, new { @class = "form-select", required = "required" })
+            </div>
+            <div class="col">
+                @Html.LabelFor(u => u.usu_rol!.rol_id, "Rol", new { @class = "form-label text-dark fw-semibold" })
+                @Html.DropDownListFor(u => u.usu_rol!.rol_id, (SelectList)ViewBag.Rol, new { @class = "form-select", required = "required" })
+            </div>
+            <div class="col">
+                @Html.LabelFor(u => u.usu_sucursal!.suc_id, "Sucursal", new { @class = "form-label text-dark fw-semibold" })
+                @Html.DropDownListFor(u => u.usu_sucursal!.suc_id, (SelectList)ViewBag.Sucursal, new { @class = "form-select", required = "required" })
+            </div>
+        </div>
+        <div class="row g-2">
+            @Html.LabelFor(u => u.usu_correo, "Correo", new { @class = "form-label text-dark fw-semibold" })
+            <div class="input-group">
+                @Html.TextBoxFor(u => u.usu_correo, new { @class = "form-control", required = "required" })
+                <span class="input-group-text"><i class="bi bi-envelope""></i></span>
             </div>
         </div>
     </div>
