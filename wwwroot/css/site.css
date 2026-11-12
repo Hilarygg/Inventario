@@ -203,3 +203,12 @@ body {
 
 .btn-verde { background: #1b6b2a; color: #fff; border-radius: 12px; }
 .btn-verde:hover { background: #155522; color: #fff; transform: translateY(-2px);}
+
+.roles-grid { display: grid; grid-template-columns: 7fr 3fr; gap: 1.5rem; align-items: start; }
+@media (max-width: 992px) { .roles-grid { grid-template-columns: 1fr; } }
+
+.panel-verde { border: none; border-radius: 1rem; overflow: hidden; box-shadow: 0 2px 10px rgba(0,0,0,.08); }
+.panel-verde-header { background: #1e5a3a; color: #fff; padding: .9rem 1.2rem; display: flex; align-items: center; justify-content: space-between; }
+.rol-seleccionado { color: #facc15; }
+.grupo-menu { border-bottom: 1px solid #eee; padding: .5rem 0; }
+.form-check-input:checked { background-color: #1e5a3a; border-color: #1e5a3a; }

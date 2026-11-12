@@ -41,7 +41,7 @@
             <div class="col">
                 @Html.LabelFor(u => u.usu_password, "Contrasena", new { @class = "form-label text-dark fw-semibold" })
                 <div class="input-group">
-                    @Html.TextBoxFor(u => u.usu_password, new { @class = "form-control", required = "required" })
+                    @Html.PasswordFor(u => u.usu_password, new { @class = "form-control", placeholder = "Dejar vacío para no cambiarla" })
                     <span class="input-group-text"><i class="bi bi-lock"></i></span>
                 </div>
             </div>

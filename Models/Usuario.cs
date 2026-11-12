@@ -77,7 +77,7 @@ public class Usuario : ConsultaBase
             {"@usu_paterno", usu_paterno},
             {"@usu_materno", usu_materno},
             {"@usu_username", usu_username},
-            {"@usu_password", usu_password},
+            {"@usu_password", BCrypt.Net.BCrypt.HashPassword(usu_password)},
             {"@usu_correo", usu_correo},
             {"@usu_activo", usu_activo?.act_id},
             {"@usu_rol", usu_rol?.rol_id},
@@ -129,33 +129,52 @@ public class Usuario : ConsultaBase
                 suc_id = reader.GetInt32(10),
                 suc_nombre = reader.GetString(11)
             };
-            reader.Close();
         }
+        reader.Close();
         return usuario;
     }
 
     public bool ActualizarUsuario()
+{
+    string passwordHash = usu_password;
+
+    if (!string.IsNullOrWhiteSpace(usu_password))
     {
-        string query = @"UPDATE Usuario SET usu_nombre = @Nombre, usu_materno = @Materno, usu_paterno = @Paterno, usu_username = @Username,
-                        usu_password = @Password, usu_correo = @Correo, usu_activo = @Activo, usu_rol = @Rol, usu_sucursal = @Sucursal
-                        WHERE usu_id = @Id";
-
-        Dictionary<string, object?> parametros = new Dictionary<string, object?>()
-        {
-            { "@Nombre", usu_nombre },
-            { "@Materno", usu_materno },
-            { "@Paterno", usu_paterno },
-            { "@Username", usu_username },
-            { "@Password", usu_password },
-            { "@Correo", usu_correo },
-            { "@Activo", usu_activo?.act_id ?? 1 },
-            { "@Rol", usu_rol?.rol_id },
-            { "@Sucursal", usu_sucursal?.suc_id },
-            { "@Id", usu_id }
-        };
-
-        return ExecutedCommand(query, parametros);
+        passwordHash = BCrypt.Net.BCrypt.HashPassword(usu_password);
     }
+    else
+    {
+        passwordHash = ObtenerUsuario(usu_id).usu_password;
+    }
+
+    string query = @"UPDATE Usuario SET
+                    usu_nombre = @Nombre,
+                    usu_materno = @Materno,
+                    usu_paterno = @Paterno,
+                    usu_username = @Username,
+                    usu_password = @Password,
+                    usu_correo = @Correo,
+                    usu_activo = @Activo,
+                    usu_rol = @Rol,
+                    usu_sucursal = @Sucursal
+                    WHERE usu_id = @Id";
+
+    Dictionary<string, object?> parametros = new Dictionary<string, object?>()
+    {
+        { "@Nombre", usu_nombre },
+        { "@Materno", usu_materno },
+        { "@Paterno", usu_paterno },
+        { "@Username", usu_username },
+        { "@Password", passwordHash },
+        { "@Correo", usu_correo },
+        { "@Activo", usu_activo?.act_id ?? 1 },
+        { "@Rol", usu_rol?.rol_id },
+        { "@Sucursal", usu_sucursal?.suc_id },
+        { "@Id", usu_id }
+    };
+
+    return ExecutedCommand(query, parametros);
+}
 
     public bool EliminarUsuario(int usu_id)
     {

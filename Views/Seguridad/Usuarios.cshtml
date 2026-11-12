@@ -110,7 +110,7 @@
                         <button type="button" class="btn btn-sm btn-primary me-1" onclick="abrirModificar(@u.usu_id)">
                             <i class="bi bi-pencil-fill"></i>
                         </button>
-                        <button type="button" class="btn btn-sm btn-danger" onclick="confirmarEliminar(@u.usu_id, '@u.usu_nombre')">
+                        <button type="button" class="btn btn-sm btn-danger" onclick="confirmarEliminar(@u.usu_id, @Html.Raw(Json.Serialize(u.usu_nombre)))">
                             <i class="bi bi-trash-fill"></i>
                         </button>
                     </td>

@@ -26,7 +26,7 @@ public class SeguridadController : Controller
         if (rol != null)
             usuarios = usuarios.Where(u => u.usu_rol?.rol_id == rol).ToList();
         if (sucursal != null)
-            usuarios = usuarios.Where(u => u.usu_sucursal?.suc_id == rol).ToList();
+            usuarios = usuarios.Where(u => u.usu_sucursal?.suc_id == sucursal).ToList();
 
         ViewBag.Buscar = buscar;
         ViewBag.Estados = new SelectList(new Activo().MostrarActivos(), "act_id", "act_nombre", estado);
@@ -49,6 +49,7 @@ public class SeguridadController : Controller
     public IActionResult ModificarUsuario(int id)
     {
         var usuario = new Usuario().ObtenerUsuario(id);
+        usuario.usu_password = "";
         ViewBag.Estados = new SelectList(new Activo().MostrarActivos(), "act_id", "act_nombre", usuario.usu_activo?.act_id);
         ViewBag.Rol = new SelectList(new Rol().MostrarRoles(), "rol_id", "rol_nombre", usuario.usu_rol?.rol_id);
         ViewBag.Sucursal = new SelectList(new Sucursal().MostrarSucursal(), "suc_id", "suc_nombre", usuario.usu_sucursal?.suc_id);
@@ -80,6 +81,29 @@ public class SeguridadController : Controller
             TempData["Error"] = "Usuario Activo, no se puede eliminar. Cambie el estado a Inactivo para poder eliminarla.";
 
         return RedirectToAction("Usuarios");
+    }
+
+    public IActionResult Permisos(int? rolId)
+    {
+        var roles = new Rol().MostrarRoles();
+        var actual = roles.FirstOrDefault(r => r.rol_id == rolId) ?? roles.FirstOrDefault();
+
+        ViewBag.RolActual = actual;
+        if (actual != null)
+            ViewBag.Permisos = new Rol().ObtenerPermisos(actual.rol_id);
+
+        return View(roles);
+    }
+
+    [HttpPost]
+    public IActionResult GuardarPermisos(int rolId, int[] menus)
+    {
+        if (new Rol().GuardarPermisos(rolId, menus))
+            TempData["Exito"] = "Permisos actualizados correctamente.";
+        else
+            TempData["Error"] = "No se pudieron guardar los permisos.";
+
+        return RedirectToAction("Index", new { rolId });
     }
 
 }
