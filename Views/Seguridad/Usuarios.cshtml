@@ -110,7 +110,9 @@
                         <button type="button" class="btn btn-sm btn-primary me-1" onclick="abrirModificar(@u.usu_id)">
                             <i class="bi bi-pencil-fill"></i>
                         </button>
-                        <button type="button" class="btn btn-sm btn-danger" onclick="confirmarEliminar(@u.usu_id, @Html.Raw(Json.Serialize(u.usu_nombre)))">
+                        <button type="button" class="btn btn-sm btn-danger"
+                                data-id="@u.usu_id" data-nombre="@u.usu_username"
+                                onclick="confirmarEliminar(this)">
                             <i class="bi bi-trash-fill"></i>
                         </button>
                     </td>
@@ -177,11 +179,12 @@
         setTimeout(() => document.querySelectorAll('.alert').forEach(a =>
         bootstrap.Alert.getOrCreateInstance(a).close()), 4000);
 
+        function confirmarEliminar(boton) {
+            document.getElementById('idEliminar').value = boton.dataset.id;
+            document.getElementById('nombreEliminar').textContent = boton.dataset.nombre;
+            new bootstrap.Modal(document.getElementById('modalEliminar')).show();
+        }
         
-        function confirmarEliminar(id, nombre) {
-                document.getElementById('idEliminar').value = id;
-                document.getElementById('nombreEliminar').textContent = nombre;
-                new bootstrap.Modal(document.getElementById('modalEliminar')).show();
-            }
+        
     </script>
 }

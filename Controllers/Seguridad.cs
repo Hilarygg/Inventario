@@ -91,7 +91,8 @@ public class SeguridadController : Controller
         ViewBag.RolActual = actual;
         if (actual != null)
             ViewBag.Permisos = new Rol().ObtenerPermisos(actual.rol_id);
-
+        
+        ViewBag.Estados = new SelectList(new Activo().MostrarActivos(), "act_id", "act_nombre");
         return View(roles);
     }
 
@@ -104,6 +105,49 @@ public class SeguridadController : Controller
             TempData["Error"] = "No se pudieron guardar los permisos.";
 
         return RedirectToAction("Index", new { rolId });
+    }
+
+    public IActionResult AgregarRol(Rol rol)
+    {
+        if (rol.InsertRol())
+            TempData["Exito"] = "Rol agregado correctamente";
+        else
+            TempData["Error"] = "No se pudo agregar el rol";
+
+        return RedirectToAction("Permisos");
+    }
+
+    public IActionResult EliminarRol(int id)
+    {
+        var rol = new Rol { rol_id = id };
+
+        if (rol.ValidarRolInactivo(id))
+            if (rol.EliminarRol(id))
+                TempData["Exito"] = "Rol eliminado correctamente.";
+            else
+                TempData["Error"] = "No se pudo eliminar el rol.";
+        else
+            TempData["Error"] = "Rol Activo, no se puede eliminar. Cambie el estado a Inactivo para poder eliminarlo.";
+
+        return RedirectToAction("Permisos");
+    }
+
+    public IActionResult ModificarRol(int id)
+    {
+        var rol = new Rol().ObtenerRol(id);
+        ViewBag.Estados = new SelectList(new Activo().MostrarActivos(), "act_id", "act_nombre", rol.rol_activo?.act_id);
+        return PartialView("ModificarRol", rol);
+    }
+
+    [HttpPost]
+    public IActionResult ModificarRol(Rol rol)
+    {
+        if (rol.ActualizarRol())
+            TempData["Exito"] = "Rol modificado correctamente.";
+        else
+            TempData["Error"] = "No se pudo modificar el Rol.";
+
+        return RedirectToAction("Permisos");
     }
 
 }

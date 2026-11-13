@@ -1,3 +1,4 @@
+using System.IO.Pipelines;
 using Microsoft.Data.SqlClient;
 
 namespace Inventario.Models;
@@ -88,5 +89,104 @@ public class Rol : ConsultaBase
         sql.Append(" COMMIT TRANSACTION;");
 
         return ExecutedCommand(sql.ToString(), parametros);
+    }
+
+    public bool InsertRol()
+    {
+        string query = @"INSERT INTO Rol
+                        (rol_nombre, rol_descripcion, rol_activo)
+                        VALUES
+                        (@rol_nombre, @rol_descripcion, @rol_activo)";
+
+        Dictionary<string, object?> Parametros = new Dictionary<string, object?>()
+        {
+            {"@rol_nombre", rol_nombre},
+            {"@rol_descripcion", rol_descripcion},
+            {"@rol_activo", rol_activo?.act_id}
+        };
+
+        return ExecutedCommand(query, Parametros);
+    }
+
+    public bool EliminarRol(int rol_id)
+    {
+        string query = @"DELETE FROM Rol WHERE rol_id = @Id";
+
+        Dictionary<string, object?> Parametros = new Dictionary<string, object?>()
+        {
+            {"@Id", rol_id}
+        };
+
+        return ExecutedCommand(query, Parametros);
+    }
+
+    public bool ValidarRolInactivo(int id)
+    {
+        string query = @"SELECT COUNT(*)
+                        FROM Rol r
+                        WHERE r.rol_id = @Id
+                        AND r.rol_activo = (SELECT act_id FROM Activo WHERE act_nombre = 'Inactivo')";
+        
+        Dictionary<string, object> Parametros = new Dictionary<string, object>()
+        {
+            {"@Id", id}
+        };
+
+        SqlDataReader reader = null!;
+        ConsultaDB(ref reader, query, Parametros);
+
+        bool validar = reader.Read() && reader.GetInt32(0) > 0;
+        reader.Close();
+
+        return validar;
+    }
+
+    public Rol ObtenerRol(int rol_id)
+    {
+        string query = @"SELECT r.rol_id, r.rol_nombre, r.rol_descripcion, a.act_id, a.act_nombre
+                        FROM Rol r
+                        INNER JOIN Activo a ON r.rol_activo = a.act_id
+                        WHERE r.rol_id = @Id";
+
+        SqlDataReader reader = null!;
+        Rol rol = new Rol();
+
+        Dictionary<string, dynamic> parametros = new Dictionary<string, dynamic>()
+        {
+            { "@Id", rol_id }
+        };
+
+        ConsultaDB(ref reader, query, parametros);
+
+        if (reader.Read())
+        {
+            rol.rol_id = reader.GetInt32(0);
+            rol.rol_nombre = reader.GetString(1);
+            rol.rol_descripcion = reader.IsDBNull(2) ? "" : reader.GetString(2);
+            rol.rol_activo = new Activo()
+            {
+                act_id = reader.GetInt32(3),
+                act_nombre = reader.GetString(4)
+            };
+        }
+        reader.Close();
+
+        return rol;
+    }
+
+    public bool ActualizarRol()
+    {
+        string query = @"UPDATE Rol SET rol_nombre = @Rol_nombre, rol_descripcion = @Rol_descripcion, rol_activo = @Rol_activo
+                        WHERE rol_id = @Rol_id ";
+
+        Dictionary<string, object?> parametros = new Dictionary<string, object?>()
+        {
+            { "@Rol_nombre", rol_nombre },
+            { "@Rol_descripcion", rol_descripcion },
+            { "@Rol_activo", rol_activo?.act_id ?? 1},
+            { "@Rol_id", rol_id}
+        };
+
+        return ExecutedCommand(query, parametros);
     }
 }

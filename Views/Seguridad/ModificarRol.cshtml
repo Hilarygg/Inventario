@@ -1,0 +1,37 @@
+@model Rol
+
+@{ Layout = null; }
+
+@using (Html.BeginForm("ModificarRol", "Seguridad", FormMethod.Post, new { enctype = "multipart/form-data" }))
+{
+    @Html.HiddenFor(r => r.rol_id)
+
+    <div class="modal-body">
+        <div class="row g-2 mb-2">
+            <div class="col">
+                @Html.LabelFor(r => r.rol_nombre, "Nombre", new { @class = "form-label text-dark fw-semibold" })
+                <div class="input-group">
+                    @Html.TextBoxFor(r => r.rol_nombre, new { @class = "form-control", required = "required" })
+                    <span class="input-group-text"><i class="bi bi-person-vcard"></i></span>
+                </div>
+            </div>
+            <div class="col">
+                @Html.LabelFor(r => r.rol_activo!.act_id, "Estado", new { @class = "form-label text-dark fw-semibold" })
+                @Html.DropDownListFor(r => r.rol_activo!.act_id, (SelectList)ViewBag.Estados, new { @class = "form-select", required = "required" })
+            </div>
+        </div>
+        <div class="row g-2 mb-2">
+            <div class="col">
+                @Html.LabelFor(r => r.rol_descripcion, "Descripcion", new { @class = "form-label text-dark fw-semibold" })
+                <div class="input-group">
+                    @Html.TextAreaFor(r => r.rol_descripcion, new { @class = "form-control", required = "required" })
+                    <span class="input-group-text"><i class="bi bi-card-text"></i></span>
+                </div>
+            </div>
+        </div>
+    </div>
+    <div class="modal-footer border-0">
+        <button type="button" class="btn btn-danger" data-bs-dismiss="modal">Cancelar</button>
+        <button type="submit" class="btn btn-success">Guardar</button>
+    </div>
+}
