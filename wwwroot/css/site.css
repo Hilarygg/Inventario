@@ -112,9 +112,11 @@ body {
     margin-right: 2rem;
 }
 
-.sidebar { width: 240px; background: #1e5a3a; padding: 1rem .5rem; }
+.sidebar { width: 240px; flex-shrink: 0; background: #1e5a3a; padding: 1rem .5rem; }
 .sidebar .nav-link { color: #fff; display: flex; align-items: center; gap: .75rem; border-radius: .5rem; }
 .sidebar .nav-link:hover { background: rgba(255,255,255,.12); }
+
+.d-flex > main { min-width: 0; }
 
 .footer-verde {
     background: #1b6b2a;
@@ -211,4 +213,7 @@ body {
 .panel-verde-header { background: #1e5a3a; color: #fff; padding: .9rem 1.2rem; display: flex; align-items: center; justify-content: space-between; }
 .rol-seleccionado { color: #facc15; }
 .grupo-menu { border-bottom: 1px solid #eee; padding: .5rem 0; }
+.form-check-input:checked { background-color: #1e5a3a; border-color: #1e5a3a; }
+
+.fila-rol { cursor: pointer; }
 .form-check-input:checked { background-color: #1e5a3a; border-color: #1e5a3a; }

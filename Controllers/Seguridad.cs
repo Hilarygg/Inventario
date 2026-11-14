@@ -97,14 +97,16 @@ public class SeguridadController : Controller
     }
 
     [HttpPost]
-    public IActionResult GuardarPermisos(int rolId, int[] menus)
+    public IActionResult GuardarPermisos(int rolId, int[]? menus)
     {
+        menus ??= Array.Empty<int>();
+
         if (new Rol().GuardarPermisos(rolId, menus))
             TempData["Exito"] = "Permisos actualizados correctamente.";
         else
             TempData["Error"] = "No se pudieron guardar los permisos.";
 
-        return RedirectToAction("Index", new { rolId });
+        return RedirectToAction("Permisos", new { rolId });
     }
 
     public IActionResult AgregarRol(Rol rol)

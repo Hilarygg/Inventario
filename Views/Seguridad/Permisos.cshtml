@@ -65,11 +65,9 @@
             <tbody>
                 @foreach (var r in Model)
                 {
-                    <tr class="@(rolActual?.rol_id == r.rol_id ? "table-success" : "")">
-                        <td>
-                            <a class="fw-semibold text-dark text-decoration-none"
-                               href="@Url.Action("Index", "Rol", new { rolId = r.rol_id })">@r.rol_nombre</a>
-                        </td>
+                    <tr class="fila-rol @(rolActual?.rol_id == r.rol_id ? "table-success" : "")"
+                        data-url="@Url.Action("Permisos", "Seguridad", new { rolId = r.rol_id })">
+                        <td class="fw-semibold">@r.rol_nombre</td>
                         <td class="text-start ps-5">@r.rol_descripcion</td>
                         <td>
                             <span class="badge rounded-pill @(r.rol_activo?.act_nombre == "Inactivo" ? "text-bg-danger" : "text-bg-success")">
@@ -106,7 +104,7 @@
         }
         else
         {
-            @using (Html.BeginForm("GuardarPermisos", "Rol", FormMethod.Post))
+            @using (Html.BeginForm("GuardarPermisos", "Seguridad", FormMethod.Post))
             {
                 @Html.Hidden("rolId", rolActual.rol_id)
 
@@ -220,5 +218,22 @@
     document.querySelectorAll('.check-padre').forEach(p =>
         p.addEventListener('change', () =>
             p.closest('.grupo-menu').querySelectorAll('.check-hijo').forEach(h => h.checked = p.checked)));
+
+    document.querySelectorAll('.fila-rol').forEach(f =>
+    f.addEventListener('click', e => {
+        if (e.target.closest('button')) return;
+        window.location = f.dataset.url;
+    }));
+
+    document.querySelectorAll('.check-padre').forEach(p =>
+        p.addEventListener('change', () =>
+            p.closest('.grupo-menu').querySelectorAll('.check-hijo').forEach(h => h.checked = p.checked)));
+
+    document.querySelectorAll('.check-hijo').forEach(h =>
+        h.addEventListener('change', () => {
+            const grupo = h.closest('.grupo-menu');
+            grupo.querySelector('.check-padre').checked =
+                grupo.querySelectorAll('.check-hijo:checked').length > 0;
+        }));
 </script>
 }
