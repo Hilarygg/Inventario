@@ -1,0 +1,177 @@
+@model List<Inventario.Models.Producto>
+
+@{
+    ViewData["Title"] = "Productos";
+}
+
+@if (TempData["Exito"] != null)
+{
+    <div class="alert alert-success alert-dismissible fade show" role="alert">
+        <i class="bi bi-check-circle-fill me-2"></i>@TempData["Exito"]
+    </div>
+}
+@if (TempData["Error"] != null)
+{
+    <div class="alert alert-danger alert-dismissible fade show" role="alert">
+        <i class="bi bi-exclamation-triangle-fill me-2"></i>@TempData["Error"]
+    </div>
+}
+
+@{
+    var historial = ViewBag.Historial as List<Inventario.Models.HistorialPrecio> ?? new();
+    var etiquetas = historial.Select(h => h.his_fechaCambio.ToString("dd/MM/yyyy"));
+    var valores = historial.Select(h => h.his_precioNuevo);
+}
+
+<nav aria-label="breadcrumb">
+    <ol class="breadcrumb">
+        <li class="breadcrumb-item">
+            <a href="@Url.Action("Panel", "Home")" class="text-success text-decoration-none">
+                <i class="bi bi-house-fill me-1"></i>Inicio
+            </a>
+        </li>
+        <li class="breadcrumb-item active" aria-current="page">Productos</li>
+    </ol>
+</nav>
+
+<div class="d-flex justify-content-between align-items-center mb-4 pb-3 border-bottom border-success">
+    <div class="d-flex align-items-center gap-3">
+        <i class="bi bi-bar-chart-line-fill text-success" style="font-size: 2.5rem;"></i>
+        <div>
+            <h1 class="fw-bold mb-0 titulo-catalogo">Historial de Precios</h1>
+            <p class="text-muted mb-0">Consulta los cambios de precio de cada producto a lo largo del tiempo.</p>
+        </div>
+    </div>
+    @using (Html.BeginForm("Crear", "Seguridad", FormMethod.Get, new { @class = "m-0" }))
+    {
+        <button type="button" class="btn-agregar" data-bs-toggle="modal" data-bs-target="#modalRol">
+            <span><i class="bi bi-search"></i></span>
+            Seleccionar Producto
+        </button>
+    }
+</div>
+
+@using (Html.BeginForm("Index", "HistorialPrecio", FormMethod.Get, new { @class = "card card-body mb-4" }))
+{
+    @Html.Hidden("productoId", (int?)ViewBag.ProductoId, new { id = "productoId" })
+    <div class="row g-3 align-items-end">
+        <div class="col-md-5">
+            <label class="form-label text-dark fw-semibold">Producto</label>
+            @Html.TextBox("productoNombre", (string?)ViewBag.ProductoNombre,
+                new { @class = "form-control", id = "productoNombre", @readonly = "readonly", placeholder = "Ningún producto seleccionado" })
+        </div>
+        <div class="col-md-3">
+            <label class="form-label text-dark fw-semibold">Desde</label>
+            @Html.TextBox("desde", ((DateTime?)ViewBag.Desde)?.ToString("yyyy-MM-dd"), new { @class = "form-control", type = "date" })
+        </div>
+        <div class="col-md-3">
+            <label class="form-label text-dark fw-semibold">Hasta</label>
+            @Html.TextBox("hasta", ((DateTime?)ViewBag.Hasta)?.ToString("yyyy-MM-dd"), new { @class = "form-control", type = "date" })
+        </div>
+    </div>
+}
+
+<div class="card panel-verde mb-4">
+    <div class="panel-verde-header">
+        <span class="fw-bold fs-5"><i class="bi bi-graph-up me-2"></i>Evolución de precios</span>
+    </div>
+    <div class="p-3">
+        @if (!historial.Any())
+        {
+            <p class="text-center text-muted my-4">Selecciona un producto para ver su historial.</p>
+        }
+        else
+        {
+            <canvas id="graficaPrecios" height="110"></canvas>
+        }
+    </div>
+</div>
+
+<div class="card panel-verde mb-4">
+    <div class="panel-verde-header">
+        <span class="fw-bold fs-5"><i class="bi bi-file-earmark-text me-2"></i>Historial de registros</span>
+    </div>
+    <table class="table table-hover align-middle mb-0">
+        <thead class="table-success">
+            <tr>
+                <th>Fecha de actualización</th><th>Precio anterior</th><th>Nuevo precio</th><th>Usuario</th>
+            </tr>
+        </thead>
+        <tbody>
+            @foreach (var h in historial.OrderByDescending(x => x.his_fechaCambio))
+            {
+                <tr>
+                    <td>@h.his_fechaCambio.ToString("dd/MM/yyyy")</td>
+                    <td>@h.his_precioAnterior.ToString("C")</td>
+                    <td>@h.his_precioNuevo.ToString("C")</td>
+                    <td>@h.his_usuario?.usu_nombre</td>
+                </tr>
+            }
+        </tbody>
+    </table>
+    <div class="p-3 small text-muted">Mostrando @historial.Count registros</div>
+</div>
+
+<div class="modal fade" id="modalProducto" tabindex="-1" aria-hidden="true">
+    <div class="modal-dialog modal-lg modal-dialog-scrollable">
+        <div class="modal-content">
+            <div class="modal-header bg-success text-white justify-content-center">
+                <h5 class="modal-title">Seleccionar producto</h5>
+            </div>
+            <div class="modal-body p-0">
+                <table class="table table-hover align-middle mb-0">
+                    <tbody>
+                        @foreach (var p in Model)
+                        {
+                            <tr style="cursor:pointer" data-id="@p.prod_id" data-nombre="@p.prod_nombre" onclick="elegirProducto(this)">
+                                <td class="ps-4">@p.prod_nombre</td>
+                                <td class="text-muted">@p.prod_marca?.mar_nombre</td>
+                            </tr>
+                        }
+                    </tbody>
+                </table>
+            </div>
+            <div class="modal-footer border-0">
+                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancelar</button>
+            </div>
+        </div>
+    </div>
+</div>
+
+@section Scripts {
+<script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.7/dist/chart.umd.min.js"></script>
+<script>
+    function elegirProducto(fila) {
+        document.getElementById('productoId').value = fila.dataset.id;
+        document.getElementById('productoNombre').value = fila.dataset.nombre;
+        bootstrap.Modal.getInstance(document.getElementById('modalProducto')).hide();
+    }
+
+    const lienzo = document.getElementById('graficaPrecios');
+    if (lienzo) {
+        new Chart(lienzo, {
+            type: 'line',
+            data: {
+                labels: @Html.Raw(System.Text.Json.JsonSerializer.Serialize(etiquetas)),
+                datasets: [{
+                    label: 'Precio de venta',
+                    data: @Html.Raw(System.Text.Json.JsonSerializer.Serialize(valores)),
+                    borderColor: '#1e5a3a',
+                    backgroundColor: '#1e5a3a',
+                    pointRadius: 5,
+                    tension: 0
+                }]
+            },
+            options: {
+                plugins: { legend: { position: 'bottom' } },
+                scales: {
+                    y: {
+                        title: { display: true, text: 'Precio ($)' },
+                        ticks: { callback: v => '$' + v }
+                    }
+                }
+            }
+        });
+    }
+</script>
+}

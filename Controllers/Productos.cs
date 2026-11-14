@@ -107,4 +107,20 @@ public class ProductoController : Controller
 
         return PartialView("_ListaProductos", productos);
     }
+
+    public IActionResult HistorialPrecio(int? productoId, DateTime fecha)
+    {
+        var productos = new Producto().MostrarProductos();
+
+        if (productoId != null)
+        {
+            ViewBag.Historial = new HistorialPrecio().MostrarHistorial(productoId.Value, fecha);
+            ViewBag.ProductoNombre = productos.FirstOrDefault(p => p.prod_id == productoId)?.prod_nombre;
+        }
+
+        ViewBag.ProductoId = productoId;
+        ViewBag.Desde = fecha;
+
+        return View(productos);
+    }
 }
