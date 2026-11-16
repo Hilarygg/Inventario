@@ -8,7 +8,6 @@ public class Producto : ConsultaBase
     public string prod_nombre { get; set; } = "";
     public string prod_codigoBarras { get; set; } = "";
     public decimal prod_precio { get; set; }
-    public decimal prod_stock { get; set; }
     public string prod_imagen { get; set; } = "";
     public decimal prod_costo { get; set; }
     public string prod_codigo { get; set; } = "";
@@ -24,7 +23,7 @@ public class Producto : ConsultaBase
     {
         string query = @"SELECT p.prod_id, p.prod_imagen, p.prod_nombre, p.prod_contenido, u.uni_id, u.uni_abreviatura, p.prod_precioventa,
                 m.mar_id, m.mar_nombre, c.cat_id, c.cat_nombre,
-                p.prod_codigoBarras, p.prod_stockMinimo, a.act_id, a.act_nombre
+                p.prod_codigoBarras, a.act_id, a.act_nombre
          FROM Producto p
          INNER JOIN Marca m ON p.prod_marca = m.mar_id
          INNER JOIN Categoria c ON p.prod_categoria = c.cat_id
@@ -61,11 +60,10 @@ public class Producto : ConsultaBase
                     cat_nombre = reader.GetString(10),
                 },
                 prod_codigo = reader.GetString(11),
-                prod_stock = reader.GetDecimal(12),
                 prod_activo = new Activo()
                 {
-                    act_id = reader.GetInt32(13),
-                    act_nombre = reader.GetString(14)
+                    act_id = reader.GetInt32(12),
+                    act_nombre = reader.GetString(13)
                 }
             };
             lista.Add(producto);
@@ -109,15 +107,14 @@ public class Producto : ConsultaBase
     
     public bool InsertProducto()
     {
-        string query = @"INSERT INTO Producto (prod_nombre, prod_codigoBarras, prod_precioventa, prod_stockMinimo, prod_imagen, prod_costoactual, prod_fechaCreacion, prod_contenido, prod_activo, prod_categoria, prod_marca, prod_proveedor, prod_unidad)
-                        VALUES (@Nombre, @CodigoBarras, @Precio, @Stock, @Imagen, @Costo, @Fecha, @Contenido, @Activo, @CategoriaId, @MarcaId, @ProveedorId, @UnidadId)";
+        string query = @"INSERT INTO Producto (prod_nombre, prod_codigoBarras, prod_precioventa, prod_imagen, prod_costoactual, prod_fechaCreacion, prod_contenido, prod_activo, prod_categoria, prod_marca, prod_proveedor, prod_unidad)
+                        VALUES (@Nombre, @CodigoBarras, @Precio, @Imagen, @Costo, @Fecha, @Contenido, @Activo, @CategoriaId, @MarcaId, @ProveedorId, @UnidadId)";
 
         Dictionary<string, object?> parameters = new Dictionary<string, object?>()
         {
             { "@Nombre", prod_nombre },
             { "@CodigoBarras", prod_codigoBarras ?? "" },
             { "@Precio", prod_precio },
-            { "@Stock", prod_stock },
             { "@Imagen", prod_imagen ?? "" },
             { "@Costo", prod_costo },
             { "@Fecha", DateTime.Now },
@@ -132,11 +129,47 @@ public class Producto : ConsultaBase
         return ExecutedCommand(query, parameters);
     }
 
+    public bool EliminarProducto(int id)
+    {
+        string query = @"SET XACT_ABORT ON;
+                        BEGIN TRANSACTION;
+                        DELETE FROM HistorialPrecio WHERE his_producto = @Id;
+                        DELETE FROM Producto WHERE prod_id = @Id;
+                        COMMIT TRANSACTION;";
+
+        Dictionary<string, object?> parameters = new Dictionary<string, object?>()
+        {
+            { "@Id", id }
+        };
+
+        return ExecutedCommand(query, parameters);
+    }
+    public bool ValidarProductoInactivo(int id)
+    {
+        string query = @"SELECT COUNT(*)
+                        FROM Producto p
+                        WHERE p.prod_id = @Id
+                        AND p.prod_activo = (SELECT act_id FROM Activo WHERE act_nombre = 'Inactivo')";
+
+        Dictionary<string, object> parametros = new Dictionary<string, object>()
+        {
+            {"@Id", id}
+        };
+
+        SqlDataReader reader = null!;
+        ConsultaDB(ref reader, query, parametros);
+
+        bool validar = reader.Read() && reader.GetInt32(0) > 0;
+        reader.Close();
+
+        return validar;
+    } 
+
     public Producto ObtenerProducto(int prod_id)
     {
         string query = @"SELECT p.prod_id, p.prod_imagen, p.prod_nombre, p.prod_contenido, u.uni_id, u.uni_abreviatura, p.prod_precioventa,
                 m.mar_id, m.mar_nombre, c.cat_id, c.cat_nombre,
-                p.prod_codigoBarras, p.prod_stockMinimo, a.act_id, a.act_nombre, pr.pro_id, pr.pro_nombre
+                p.prod_codigoBarras, a.act_id, a.act_nombre, pr.pro_id, pr.pro_nombre, p.prod_costoactual
          FROM Producto p
          INNER JOIN Marca m ON p.prod_marca = m.mar_id
          INNER JOIN Categoria c ON p.prod_categoria = c.cat_id
@@ -177,17 +210,18 @@ public class Producto : ConsultaBase
                 cat_nombre = reader.GetString(10),
             };
             producto.prod_codigoBarras = reader.GetString(11);
-            producto.prod_stock = reader.GetDecimal(12);
             producto.prod_activo = new Activo()
             {
-                act_id = reader.GetInt32(13),
-                act_nombre = reader.GetString(14)
+                act_id = reader.GetInt32(12),
+                act_nombre = reader.GetString(13)
             };
             producto.prod_proveedor = new Proveedor()
             {
-                pro_id = reader.GetInt32(15),
-                pro_nombre = reader.GetString(16)
+                pro_id = reader.GetInt32(14),
+                pro_nombre = reader.GetString(15)
             };
+            producto.prod_costo = reader.GetDecimal(16);
+
             reader.Close();
          }
          return producto;
@@ -195,7 +229,7 @@ public class Producto : ConsultaBase
 
     public bool ActualizarProducto()
     {
-        string query = @"UPDATE Producto SET prod_nombre = @Nombre, prod_codigoBarras = @CodigoBarras, prod_precioventa = @Precio, prod_stockMinimo = @Stock, prod_imagen = @Imagen, prod_costoactual = @Costo, prod_contenido = @Contenido, prod_activo = @Activo, prod_categoria = @CategoriaId, prod_marca = @MarcaId, prod_proveedor = @ProveedorId, prod_unidad = @UnidadId
+        string query = @"UPDATE Producto SET prod_nombre = @Nombre, prod_codigoBarras = @CodigoBarras, prod_precioventa = @Precio, prod_imagen = @Imagen, prod_costoactual = @Costo, prod_contenido = @Contenido, prod_activo = @Activo, prod_categoria = @CategoriaId, prod_marca = @MarcaId, prod_proveedor = @ProveedorId, prod_unidad = @UnidadId
                         WHERE prod_id = @Id";
 
         Dictionary<string, object?> parameters = new Dictionary<string, object?>()
@@ -203,7 +237,6 @@ public class Producto : ConsultaBase
             { "@Nombre", prod_nombre },
             { "@CodigoBarras", prod_codigoBarras ?? "" },
             { "@Precio", prod_precio },
-            { "@Stock", prod_stock },
             { "@Imagen", prod_imagen ?? "" },
             { "@Costo", prod_costo },
             { "@Contenido", prod_contenido },

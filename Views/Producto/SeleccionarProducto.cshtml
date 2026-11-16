@@ -1,0 +1,94 @@
+
+@model List<Inventario.Models.Producto>
+
+<div class="modal-body p-3">
+    <div class="input-group input-group-sm mb-3">
+        <span class="input-group-text bg-white">
+            <i class="bi bi-search"></i>
+        </span>
+        <input type="text" class="form-control" placeholder="Buscar producto..."
+               oninput="filtrarProductos(this.value)" />
+    </div>
+
+    <ul class="list-group list-group-flush" id="listaSeleccion">
+        @foreach (var p in Model)
+        {
+            <li class="list-group-item d-flex align-items-center gap-2 px-2 py-2"
+                data-nombre="@p.prod_nombre.ToLower()">
+
+                <div class="imagen-producto">
+                    @if (!string.IsNullOrEmpty(p.prod_imagen))
+                    {
+                        <img src="/Images/Productos/@p.prod_imagen" alt="@p.prod_nombre" />
+                    }
+                    else
+                    {
+                        <i class="bi bi-image text-secondary"></i>
+                    }
+                </div>
+
+                <div class="flex-grow-1 overflow-hidden">
+                    <div class="fw-semibold text-truncate">@p.prod_nombre</div>
+                    <span class="badge rounded-pill cat-@(p.prod_categoria?.cat_id % 6)">
+                        @p.prod_categoria?.cat_nombre
+                    </span>
+                </div>
+
+                <button type="button" class="btn btn-outline-success btn-sm flex-shrink-0"
+                        data-id="@p.prod_id"
+                        data-nombre="@p.prod_nombre"
+                        data-bs-dismiss="modal"
+                        onclick="elegirProducto(this)">
+                    <i class="bi bi-check2 me-1"></i>Seleccionar
+                </button>
+            </li>
+        }
+    </ul>
+</div>
+
+<style>
+    .imagen-producto {
+        width: 42px;
+        height: 42px;
+        flex-shrink: 0;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        background: #f8f9fa;
+        border-radius: 8px;
+    }
+
+    .imagen-producto img {
+        width: 100%;
+        height: 100%;
+        object-fit: contain;
+        padding: 3px;
+    }
+
+    .imagen-producto i {
+        font-size: 1.4rem;
+    }
+
+    #listaSeleccion {
+        max-height: 320px;
+        overflow-y: auto;
+    }
+
+    #listaSeleccion .list-group-item {
+        border-bottom: 1px solid #eeeeee;
+    }
+
+    #listaSeleccion .list-group-item:last-child {
+        border-bottom: 0;
+    }
+</style>
+
+<script>
+    function filtrarProductos(texto) {
+        texto = texto.toLowerCase().trim();
+
+        document.querySelectorAll('#listaSeleccion li').forEach(li =>
+            li.classList.toggle('d-none', !li.dataset.nombre.includes(texto))
+        );
+    }
+</script>

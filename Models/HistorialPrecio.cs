@@ -23,34 +23,36 @@ public class HistorialPrecio : ConsultaBase
             {"@PrecioAnterior", his_precioAnterior},
             {"@PrecioNuevo", his_precioNuevo},
             {"@FechaCambio", his_fechaCambio},
-            {"@Producto", his_producto},
-            {"@Usuario", his_usuario}
+            {"@Producto", his_producto?.prod_id},
+            {"@Usuario", his_usuario?.usu_id}
         };
 
         return ExecutedCommand(query, parametros);
     }
 
-    public List<HistorialPrecio> MostrarHistorial(int his_producto, DateTime his_fechaCambio)
+    public List<HistorialPrecio> MostrarHistorial(int productoId, int? anio)
     {
-        string query = @"SELECT h.his_id, h.his_precioAnterior, h.his_precioNuevo, h.his_fechaCambio
-                        h.his_usuario, u.usu_username
+        string query = @"SELECT h.his_id, h.his_precioAnterior, h.his_precioNuevo, h.his_fechaCambio,
+                                h.his_usuario, u.usu_username
                         FROM HistorialPrecio h
                         INNER JOIN Usuario u ON h.his_usuario = u.usu_id
-                        WHERE h.his_producto = @his_producto AND h.his_fechaCambio = @his_fecha";
+                        WHERE h.his_producto = @Producto
+                        AND (@Anio IS NULL OR YEAR(h.his_fechaCambio) = @Anio)
+                        ORDER BY h.his_fechaCambio";
 
-        Dictionary<string, dynamic> parametros = new Dictionary<string, dynamic>()
+        Dictionary<string, object> parametros = new Dictionary<string, object>()
         {
-            {"@his_producto", his_producto},
-            {"@his_fecha", his_fechaCambio}
+            { "@Producto", productoId },
+            { "@Anio", (object?)anio ?? DBNull.Value }
         };
 
         SqlDataReader reader = null!;
         List<HistorialPrecio> lista = new List<HistorialPrecio>();
         ConsultaDB(ref reader, query, parametros);
 
-        while(reader.Read())
+        while (reader.Read())
         {
-            HistorialPrecio historial = new HistorialPrecio()
+            lista.Add(new HistorialPrecio()
             {
                 his_id = reader.GetInt32(0),
                 his_precioAnterior = reader.GetDecimal(1),
@@ -61,9 +63,10 @@ public class HistorialPrecio : ConsultaBase
                     usu_id = reader.GetInt32(4),
                     usu_username = reader.GetString(5)
                 }
-            };
-            lista.Add(historial);
+            });
         }
+        reader.Close();
+
         return lista;
     }
 }
