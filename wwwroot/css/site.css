@@ -217,3 +217,26 @@ body {
 
 .fila-rol { cursor: pointer; }
 .form-check-input:checked { background-color: #1e5a3a; border-color: #1e5a3a; }
+
+/* Existencias.cshtml */
+.tarjeta-resumen { display: flex; align-items: center; gap: 1rem; padding: 1rem 1.2rem; border-radius: .8rem; border: 1px solid; height: 100%; }
+.tarjeta-resumen .icono { font-size: 2.6rem; line-height: 1; }
+.tarjeta-resumen .numero { font-size: 1.7rem; font-weight: 700; color: #1f2937; line-height: 1.1; }
+.tarjeta-resumen .etiqueta { font-size: .85rem; font-weight: 500; }
+
+.resumen-verde { background: #e8f5e4; border-color: #cfe6c8; }
+.resumen-verde .icono, .resumen-verde .etiqueta { color: #1e6b2e; }
+
+.resumen-azul { background: #e3efff; border-color: #c5dcfa; }
+.resumen-azul .icono, .resumen-azul .etiqueta { color: #1e4f8f; }
+
+.resumen-naranja { background: #ffe9db; border-color: #fbd3b8; }
+.resumen-naranja .icono { color: #f97316; }
+.resumen-naranja .etiqueta { color: #c2410c; }
+
+.resumen-morado { background: #efe6fb; border-color: #dccbf5; }
+.resumen-morado .icono, .resumen-morado .etiqueta { color: #6b2fa5; }
+
+.estado-disponible { background: #c9efc0; color: #1e6b2e; }
+.estado-bajo { background: #ffe8b8; color: #b45309; }
+.estado-sin { background: #fbcaca; color: #b91c1c; }

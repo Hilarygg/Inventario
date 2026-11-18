@@ -216,4 +216,18 @@ public class CatalogosController : Controller
 
         return RedirectToAction("Proveedores");
     }
+
+    public IActionResult Sucursal(string? buscar, int? estado = 1)
+    {
+        var sucursal = new Sucursal().MostrarSucursal();
+
+        if (!string.IsNullOrEmpty(buscar))
+            sucursal = sucursal.Where(s => s.suc_nombre.Contains(buscar, StringComparison.OrdinalIgnoreCase)).ToList();
+        if (estado != null)
+            sucursal = sucursal.Where(s => s.suc_activo?.act_id == estado).ToList();
+
+        ViewBag.Buscar = buscar;
+        ViewBag.Estados = new SelectList(new Activo().MostrarActivos(), "act_id", "act_nombre", estado);
+        return View(sucursal);
+    }
 }

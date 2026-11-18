@@ -1,0 +1,38 @@
+@model Inventarios
+
+@using (Html.BeginForm("AgregarInventario", "Inventario", FormMethod.Post, new { enctype = "multipart/form-data" }))
+{
+    <div class="modal-body">
+        @Html.HiddenFor(i => i.inv_producto!.prod_id)
+
+        <div class="row g-2 mb-2 align-items-end">
+            <div class="col-9">
+                @Html.LabelFor(i => i.inv_producto!.prod_nombre, "Producto", new { @class = "form-label text-dark fw-semibold" })
+                <div class="input-group">
+                    @Html.TextBoxFor(i => i.inv_producto!.prod_nombre, new { @class = "form-control", disabled = "disabled", @readonly = "readonly", placeholder = "Ningún producto seleccionado" })
+                    <span class="input-group-text"><i class="bi bi-tag"></i></span>
+                </div>
+            </div>
+            <div class="col-3">
+                <button type="button" class="btn btn-success w-100" onclick="abrirSelector()">
+                    <i class="bi bi-search me-1"></i>Seleccionar
+                </button>
+            </div>
+        </div>
+        <div class="row g-2">
+            <div class="col">
+                @Html.LabelFor(i => i.inv_sucursal!.suc_id, "Sucursal", new { @class = "form-label text-dark fw-semibold" })
+                @Html.DropDownListFor(i => i.inv_sucursal!.suc_id, (SelectList)ViewBag.Sucursal, "Seleccione", new { @class = "form-select", required = "required" })
+            </div>
+            <div class="col">
+                @Html.LabelFor(i => i.inv_cantidad, "Stock", new { @class = "form-label text-dark fw-semibold" })
+                @Html.TextBoxFor(i => i.inv_cantidad, new { @class = "form-control", type = "number", step = "0.01", required = "required" })
+            </div>
+        </div>
+    </div>
+
+    <div class="modal-footer border-0">
+        <button type="button" class="btn btn-danger" data-bs-dismiss="modal">Cancelar</button>
+        <button type="submit" class="btn btn-success">Guardar</button>
+    </div>
+}

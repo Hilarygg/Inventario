@@ -155,9 +155,4 @@ public class ProductoController : Controller
 
         return View(productos);
     }
-
-    public IActionResult SeleccionarProducto()
-    {
-        return RedirectToAction("Index");
-    }
 }
