@@ -230,4 +230,15 @@ public class CatalogosController : Controller
         ViewBag.Estados = new SelectList(new Activo().MostrarActivos(), "act_id", "act_nombre", estado);
         return View(sucursal);
     }
+
+    [HttpPost]
+    public IActionResult AgregarSucursar(Sucursal sucursal)
+    {
+        if(sucursal.InsertSucursal())
+            TempData["Exito"] = "Sucursal agregada correctamente.";
+        else
+            TempData["Error"] = "No se pudo agregar la sucursal.";
+
+        return RedirectToAction("Sucursal");
+    }
 }

@@ -1,0 +1,108 @@
+@model List<Inventario.Models.Sucursal>
+
+@{
+    ViewData["Title"] = "Sucursal";
+}
+
+@if (TempData["Exito"] != null)
+{
+    <div class="alert alert-success alert-dismissible fade show" role="alert">
+        <i class="bi bi-check-circle-fill me-2"></i>@TempData["Exito"]
+    </div>
+}
+@if (TempData["Error"] != null)
+{
+    <div class="alert alert-danger alert-dismissible fade show" role="alert">
+        <i class="bi bi-exclamation-triangle-fill me-2"></i>@TempData["Error"]
+    </div>
+}
+
+<nav aria-label="breadcrumb">
+    <ol class="breadcrumb">
+        <li class="breadcrumb-item">
+            <a href="@Url.Action("Panel", "Home")" class="text-success text-decoration-none">
+                <i class="bi bi-house-fill me-1"></i>Inicio
+            </a>
+        </li>
+        <li class="breadcrumb-item active" aria-current="page">Catalogos</li>
+    </ol>
+</nav>
+
+<div class="d-flex justify-content-between align-items-center mb-4">
+    <div class="d-flex align-items-center gap-3">
+        <img src="/Images/cubo_verde.png" alt="Productos" style="height:60px" />
+        <div>
+            <h1 class="fw-bold mb-0">Sucursal</h1>
+            <p class="text-muted mb-0">Gestiona la información y los datos de cada sucursal.</p>
+        </div>
+    </div>
+    @using (Html.BeginForm("Crear", "Catalogos", FormMethod.Get, new { @class = "m-0" }))
+    {
+        <button type="button" class="btn-agregar" data-bs-toggle="modal" data-bs-target="#modalSucursal">
+            <span class="btn-agregar-icono"><i class="bi bi-plus-lg"></i></span>
+            Agregar Sucursal
+        </button>
+    }
+</div>
+
+@using (Html.BeginForm("Sucursal", "Catalogos", FormMethod.Get, new { @class = "card card-body mb-4" }))
+{
+    <div class="row g-3 align-items-end">
+        <div class="col-md-10">
+            <div class="input-group">
+                @Html.TextBox("buscar", (string)ViewBag.Buscar, new { @class = "form-control", placeholder = "Buscar por nombre, código o marca..." })
+                <button class="btn btn-success"><i class="bi bi-search me-1"></i>Buscar</button>
+            </div>
+        </div>
+        <div class="col-md-2">
+            <label class="form-label form-label text-dark fw-semibold">Estado</label>
+            @Html.DropDownList("estado", (SelectList)ViewBag.Estados, new { @class = "form-select", onchange = "this.form.submit()" })
+        </div>
+    </div>
+}
+
+<div class="card">
+    <table class="table table-hover mb-0">
+        <thead class="table-success">
+            <tr>
+                <th style="width: 30%;">Sucursal</th>
+                <th style="width: 40%;">Direccion</th>
+                <th style="width: 35%">Estado</th>
+                <th style="width: 45%">Acciones</th>
+            </tr>
+        </thead>
+        <tbody>
+            @foreach (var s in Model)
+            {
+                <tr>
+                    <td>@s.suc_nombre</td>
+                    <td>@s.suc_direccion</td>
+                    <td>
+                        <span class="badge rounded-pill @(s.suc_activo?.act_nombre == "Inactivo" ? "text-bg-danger" : "text-bg-success")">
+                            @s.suc_activo?.act_nombre
+                        </span>
+                    </td>   
+                    <td class="text-center">
+                        <button type="button" class="btn btn-sm btn-primary me-1" onclick="abrirModificar(@s.suc_id)">
+                            <i class="bi bi-pencil-fill"></i>
+                        </button>
+                        <button type="button" class="btn btn-sm btn-danger" onclick="confirmarEliminar(@s.suc_id, '@s.suc_nombre')">
+                            <i class="bi bi-trash-fill"></i>
+                        </button>
+                    </td>
+                </tr>
+            }
+        </tbody>
+    </table>
+</div>
+
+<div class="modal fade" id="modalSucursal" tabindex="-1" aria-hidden="true" data-bs-backdrop="static" data-bs-keyboard="false">
+    <div class="modal-dialog modal-lg">
+        <div class="modal-content">
+            <div class="modal-header bg-success text-white justify-content-center">
+                <h5 class="modal-title">Agregar Sucursal</h5>
+            </div>
+            @await Html.PartialAsync("AgregarSucursal", new Inventario.Models.Sucursal())
+        </div>
+    </div>
+</div>
