@@ -232,12 +232,49 @@ public class CatalogosController : Controller
     }
 
     [HttpPost]
-    public IActionResult AgregarSucursar(Sucursal sucursal)
+    public IActionResult AgregarSucursal(Sucursal sucursal)
     {
         if(sucursal.InsertSucursal())
             TempData["Exito"] = "Sucursal agregada correctamente.";
         else
             TempData["Error"] = "No se pudo agregar la sucursal.";
+
+        return RedirectToAction("Sucursal");
+    }
+
+    public IActionResult ModificarSucursal(int id)
+    {
+        var sucursal = new Sucursal().ObtenerSucursal(id);
+        ViewBag.Estados = new SelectList(new Activo().MostrarActivos(), "act_id", "act_nombre", sucursal.suc_activo?.act_id);
+        return PartialView("ModificarSucursal", sucursal);
+    }
+
+    [HttpPost]
+    public IActionResult ModificarSucursal(Sucursal sucursal)
+    {
+        if(sucursal.ActualizarSucursal())
+            TempData["Exito"] = "Sucursal modificado correctamente.";
+        else 
+            TempData["Error"] = "No se pudo modificar la sucursal";
+
+        return RedirectToAction("Sucursal");
+    }
+
+    [HttpPost]
+    public IActionResult EliminarSucursal(int id)
+    {
+        var sucursal = new Sucursal { suc_id = id};
+
+        if(sucursal.ValidarSucursalInactiva(id))
+            if(sucursal.ValidarSucursalInventario(id))
+                if(sucursal.EliminarSucursal(id))
+                    TempData["Exito"] = "Sucursal eliminada correctamente.";
+                else
+                    TempData["Error"] = "No se pudo eliminar la sucursal.";
+            else
+                TempData["Error"] = "No se puede eliminar la Sucursal porque tiene existencias asociadas.";
+        else
+            TempData["Error"] = "Sucursal Activa, no se puede eliminar. Cambie el estado a Inactivo para poder eliminarla.";
 
         return RedirectToAction("Sucursal");
     }

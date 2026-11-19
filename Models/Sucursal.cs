@@ -84,4 +84,74 @@ public class Sucursal : ConsultaBase
         }
         return sucursal;
     }
+
+    public bool ActualizarSucursal()
+    {
+        string query = @"UPDATE Sucursal
+                        SET suc_nombre = @nombre, suc_direccion = @direccion, suc_activo = @activo
+                        WHERE suc_id = @suc_id";
+
+        Dictionary<string, dynamic?> parametros = new Dictionary<string, dynamic?>()
+        {
+            {"@nombre", suc_nombre},
+            {"@direccion", suc_direccion},
+            {"@activo", suc_activo?.act_id},
+            {"@suc_id", suc_id}
+        };
+
+        return ExecutedCommand(query, parametros);
+    }
+
+    public bool EliminarSucursal(int suc_id)
+    {
+        string query = @"DELETE FROM Sucursal WHERE suc_id = @Id";
+
+        Dictionary<string, dynamic?> parametros = new Dictionary<string, dynamic?>()
+        {
+            {"@Id", suc_id}
+        };
+
+        return ExecutedCommand(query, parametros);
+    }
+
+    public bool ValidarSucursalInactiva(int suc_id)
+    {
+        string query = @"SELECT COUNT(*)
+                        FROM Sucursal s
+                        WHERE s.suc_id = @Id
+                        AND s.suc_activo = (SELECT act_id FROM Activo WHERE act_nombre = 'Inactivo')";
+    
+        Dictionary<string, object> parametros = new Dictionary<string, object>()
+        {
+            { "@Id", suc_id }
+        };
+
+        SqlDataReader reader = null!;
+        ConsultaDB(ref reader, query, parametros);
+
+        bool validar = reader.Read() && reader.GetInt32(0) > 0;
+        reader.Close();
+
+        return validar;
+    }
+
+    public bool ValidarSucursalInventario(int suc_id)
+    {
+        string query = @"SELECT COUNT(*)
+                        FROM Inventario i
+                        WHERE i.inv_sucursal = @Id ";
+
+        Dictionary<string, dynamic> parametros = new Dictionary<string, dynamic>()
+        {
+            {"@Id", suc_id}
+        };
+
+        SqlDataReader reader = null!;
+        ConsultaDB(ref reader, query, parametros);
+
+        bool validar = reader.Read() && reader.GetInt32(0) == 0;
+        reader.Close();
+
+        return validar;
+    }
 }
