@@ -47,4 +47,17 @@ public class InventarioController : Controller
 
         return RedirectToAction("Existencias");
     }
+
+    public IActionResult Ajuste()
+    {
+        var resumen = new Inventarios().ObtenerResumen();
+        ViewBag.Total = resumen.total;
+        ViewBag.ConStock = resumen.conStock;
+
+        ViewBag.Sucursales = new SelectList(new Sucursal().MostrarSucursal(), "suc_id", "suc_nombre");
+        ViewBag.Categorias = new SelectList(new Categoria().MostrarCategoriasPublico(), "cat_id", "cat_nombre");
+        ViewBag.Productos = new SelectList(new Producto().MostrarProductos(), "prod_id", "prod_nombre");
+
+        return View(new ConteoInventario().MostrarInventariado());
+    }
 }

@@ -1,0 +1,186 @@
+@model List<ConteoInventario>
+@{
+    ViewData["Title"] = "Inventariado y ajustes";
+    var ultimo = Model.FirstOrDefault();
+    int enProceso = Model.Count(c => c.coninv_estado == "En proceso");
+}
+
+<style>
+    .inv-verde { background-color: #1b6b3a; color: #fff; }
+    .inv-icono { width: 52px; height: 52px; border-radius: 10px; }
+    .inv-card { border: 1px solid #cfe3d4; border-radius: 10px; overflow: hidden; }
+    .inv-stat { border-radius: 10px; padding: 1rem; text-align: center; }
+    .inv-stat h2 { font-weight: 700; margin: .25rem 0 0; }
+    .stat-verde { background: #e6f4ea; border: 1px solid #cfe3d4; }
+    .stat-azul { background: #e3f0fb; border: 1px solid #c9def2; }
+    .stat-naranja { background: #fff0e0; border: 1px solid #f5d9b8; }
+    .inv-tabla thead th { background: #e6f4ea; color: #1b6b3a; }
+</style>
+
+<div class="container-fluid py-3">
+
+    <!-- Encabezado -->
+    <div class="d-flex align-items-center gap-3 mb-2">
+        <div class="inv-verde inv-icono d-flex align-items-center justify-content-center">
+            <i class="bi bi-clipboard-data fs-2"></i>
+        </div>
+        <div>
+            <h2 class="mb-0 fw-bold" style="color:#1b6b3a;">Inventariado y Ajustes</h2>
+            <small class="text-muted">Realiza conteos de inventario y registra ajustes en el stock.</small>
+        </div>
+    </div>
+    <hr style="border-top: 2px solid #1b6b3a; opacity: 1;" />
+
+    <div class="row g-3 mb-4">
+
+        <!-- Nuevo inventario -->
+        <div class="col-lg-3">
+            <div class="inv-card h-100">
+                <div class="inv-verde px-3 py-2 fw-bold">
+                    <i class="bi bi-calculator me-2"></i>Nuevo Inventario
+                </div>
+                <form asp-action="IniciarConteo" method="post" class="p-3">
+                    <label class="form-label fw-semibold mb-1">Sucursal</label>
+                    <select name="sucursal" class="form-select form-select-sm mb-2" asp-items="ViewBag.Sucursales"></select>
+
+                    <label class="form-label fw-semibold mb-1">Categoría</label>
+                    <select name="categoria" class="form-select form-select-sm mb-2" asp-items="ViewBag.Categorias">
+                        <option value="">Todas</option>
+                    </select>
+
+                    <label class="form-label fw-semibold mb-1">Fecha de inventario</label>
+                    <input type="date" name="fecha" class="form-control form-control-sm mb-3"
+                           value="@DateTime.Today.ToString("yyyy-MM-dd")" />
+
+                    <button class="btn btn-success w-100">
+                        <i class="bi bi-play-fill me-1"></i>Iniciar Conteo
+                    </button>
+                </form>
+            </div>
+        </div>
+
+        <!-- Resumen -->
+        <div class="col-lg-6">
+            <div class="inv-card h-100 p-3" style="background:#f3faf5;">
+                <div class="alert alert-success py-2 mb-3">
+                    <i class="bi bi-info-circle-fill me-2"></i>
+                    @if (ultimo != null)
+                    {
+                        <span>Último inventario: <strong>@ultimo.coninv_fecha.ToString("dd/MM/yyyy")</strong>
+                        en <strong>@ultimo.coninv_sucursal?.suc_nombre</strong></span>
+                    }
+                    else
+                    {
+                        <span>Aún no hay inventarios registrados.</span>
+                    }
+                </div>
+
+                <div class="row g-3">
+                    <div class="col-md-4">
+                        <div class="inv-stat stat-verde">
+                            <i class="bi bi-box-seam-fill fs-1 text-success"></i>
+                            <h2>@ViewBag.Total</h2>
+                            <div>Productos totales</div>
+                        </div>
+                    </div>
+                    <div class="col-md-4">
+                        <div class="inv-stat stat-azul">
+                            <i class="bi bi-check-circle-fill fs-1 text-primary"></i>
+                            <h2>@ViewBag.ConStock</h2>
+                            <div>Con stock</div>
+                        </div>
+                    </div>
+                    <div class="col-md-4">
+                        <div class="inv-stat stat-naranja">
+                            <i class="bi bi-exclamation-triangle-fill fs-1 text-warning"></i>
+                            <h2>@enProceso</h2>
+                            <div>Conteos en proceso</div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Ajustes rápidos -->
+        <div class="col-lg-3">
+            <div class="inv-card h-100">
+                <div class="inv-verde px-3 py-2 fw-bold">
+                    <i class="bi bi-sliders me-2"></i>Ajustes Rápidos
+                </div>
+                <form asp-action="AjusteRapido" method="post" class="p-3">
+                    <label class="form-label fw-semibold mb-1">Producto</label>
+                    <select name="producto" class="form-select form-select-sm mb-2" asp-items="ViewBag.Productos" required>
+                        <option value="">Selecciona un producto...</option>
+                    </select>
+
+                    <label class="form-label fw-semibold mb-1">Sucursal</label>
+                    <select name="sucursal" class="form-select form-select-sm mb-2" asp-items="ViewBag.Sucursales"></select>
+
+                    <label class="form-label fw-semibold mb-1">Tipo de ajuste</label>
+                    <select name="tipo" class="form-select form-select-sm mb-2">
+                        <option>Ajuste</option>
+                        <option>Entrada</option>
+                        <option>Salida</option>
+                    </select>
+
+                    <label class="form-label fw-semibold mb-1">Cantidad</label>
+                    <input type="number" name="cantidad" class="form-control form-control-sm mb-2" value="0" />
+
+                    <label class="form-label fw-semibold mb-1">Motivo</label>
+                    <input type="text" name="motivo" class="form-control form-control-sm mb-3"
+                           placeholder="Ej. Error de conteo..." required />
+
+                    <button class="btn btn-warning w-100 fw-semibold">
+                        <i class="bi bi-check-lg me-1"></i>Registrar Ajuste
+                    </button>
+                </form>
+            </div>
+        </div>
+    </div>
+
+    <!-- Historial -->
+    <div class="inv-card">
+        <div class="inv-verde px-3 py-2 fw-bold">
+            <i class="bi bi-box-seam me-2"></i>Últimos Inventarios
+        </div>
+        <div class="table-responsive">
+            <table class="table table-hover align-middle text-center mb-0 inv-tabla">
+                <thead>
+                    <tr>
+                        <th>Fecha</th>
+                        <th>Sucursal</th>
+                        <th>Categoría</th>
+                        <th>Usuario</th>
+                        <th>Estado</th>
+                        <th>Detalles</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    @foreach (var c in Model)
+                    {
+                        <tr>
+                            <td>@c.coninv_fecha.ToString("dd/MM/yyyy HH:mm")</td>
+                            <td>@c.coninv_sucursal?.suc_nombre</td>
+                            <td>@(c.coninv_categoria?.cat_nombre ?? "Todas")</td>
+                            <td>@c.coninv_usuario?.usu_nombre</td>
+                            <td>
+                                <span class="badge rounded-pill @(c.coninv_estado == "Finalizado" ? "bg-success-subtle text-success-emphasis" : "bg-warning-subtle text-warning-emphasis")">
+                                    @c.coninv_estado
+                                </span>
+                            </td>
+                            <td>
+                                <a asp-action="DetalleConteo" asp-route-id="@c.coninv_id"
+                                   class="btn btn-sm btn-outline-success">
+                                    <i class="bi bi-eye"></i>
+                                </a>
+                            </td>
+                        </tr>
+                    }
+                </tbody>
+            </table>
+        </div>
+        <div class="px-3 py-2 small text-muted">
+            Mostrando @Model.Count registros
+        </div>
+    </div>
+</div>
