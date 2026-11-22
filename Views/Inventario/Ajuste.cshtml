@@ -37,7 +37,7 @@
         <div class="col-lg-3">
             <div class="inv-card h-100">
                 <div class="inv-verde px-3 py-2 fw-bold">
-                    <i class="bi bi-calculator me-2"></i>Nuevo Inventario
+                    <i class="bi bi-calculator me-2"></i>Nuevo Inventariado
                 </div>
                 <form asp-action="IniciarConteo" method="post" class="p-3">
                     <label class="form-label fw-semibold mb-1">Sucursal</label>
@@ -48,7 +48,7 @@
                         <option value="">Todas</option>
                     </select>
 
-                    <label class="form-label fw-semibold mb-1">Fecha de inventario</label>
+                    <label class="form-label fw-semibold mb-1">Fecha de inventariado</label>
                     <input type="date" name="fecha" class="form-control form-control-sm mb-3"
                            value="@DateTime.Today.ToString("yyyy-MM-dd")" />
 

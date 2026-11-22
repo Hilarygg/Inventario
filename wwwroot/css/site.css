@@ -240,3 +240,5 @@ body {
 .estado-disponible { background: #c9efc0; color: #1e6b2e; }
 .estado-bajo { background: #ffe8b8; color: #b45309; }
 .estado-sin { background: #fbcaca; color: #b91c1c; }
+
+.resumen-compra { background: #eef6ea; border: 1px solid #d5e8cf; border-radius: 1rem; }
