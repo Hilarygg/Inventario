@@ -27,7 +27,7 @@
                 </div>
 
                 <div class="flex-grow-1 overflow-hidden">
-                    <div class="fw-semibold text-truncate">@p.prod_nombre</div>
+                    <div class="fw-semibold text-truncate">@p.prod_nombre @p.prod_contenido @p.prod_unidad?.uni_abreviatura</div>
                     <span class="badge rounded-pill cat-@(p.prod_categoria?.cat_id % 6)">
                         @p.prod_categoria?.cat_nombre
                     </span>
@@ -36,6 +36,9 @@
                 <button type="button" class="btn btn-outline-success btn-sm flex-shrink-0"
                         data-id="@p.prod_id"
                         data-nombre="@p.prod_nombre"
+                        data-contenido="@p.prod_contenido"
+                        data-unidad="@p.prod_unidad?.uni_abreviatura"
+                        data-costo="@p.prod_costo"
                         data-bs-dismiss="modal"
                         onclick="elegirProducto(this)">
                     <i class="bi bi-check2 me-1"></i>Seleccionar

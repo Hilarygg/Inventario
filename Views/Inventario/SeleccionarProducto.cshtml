@@ -1,4 +1,3 @@
-
 @model List<Inventario.Models.Producto>
 
 <div class="modal-body p-3">
@@ -37,6 +36,9 @@
                 <button type="button" class="btn btn-outline-success btn-sm flex-shrink-0"
                         data-id="@p.prod_id"
                         data-nombre="@p.prod_nombre"
+                        data-costo="@p.prod_costo.ToString("0.00", System.Globalization.CultureInfo.InvariantCulture)"
+                        data-contenido="@p.prod_contenido"
+                        data-unidad="@p.prod_unidad?.uni_abreviatura"
                         data-bs-dismiss="modal"
                         onclick="elegirProducto(this)">
                     <i class="bi bi-check2 me-1"></i>Seleccionar

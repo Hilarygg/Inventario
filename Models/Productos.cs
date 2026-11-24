@@ -23,7 +23,7 @@ public class Producto : ConsultaBase
     {
         string query = @"SELECT p.prod_id, p.prod_imagen, p.prod_nombre, p.prod_contenido, u.uni_id, u.uni_abreviatura, p.prod_precioventa,
                 m.mar_id, m.mar_nombre, c.cat_id, c.cat_nombre,
-                p.prod_codigoBarras, a.act_id, a.act_nombre
+                p.prod_codigoBarras, a.act_id, a.act_nombre, p.prod_costoactual
          FROM Producto p
          INNER JOIN Marca m ON p.prod_marca = m.mar_id
          INNER JOIN Categoria c ON p.prod_categoria = c.cat_id
@@ -63,8 +63,9 @@ public class Producto : ConsultaBase
                 prod_activo = new Activo()
                 {
                     act_id = reader.GetInt32(12),
-                    act_nombre = reader.GetString(13)
-                }
+                    act_nombre = reader.GetString(13),
+                },
+                prod_costo = reader.GetDecimal(14)
             };
             lista.Add(producto);
         }

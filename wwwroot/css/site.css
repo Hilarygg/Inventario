@@ -206,6 +206,9 @@ body {
 .btn-verde { background: #1b6b2a; color: #fff; border-radius: 12px; }
 .btn-verde:hover { background: #155522; color: #fff; transform: translateY(-2px);}
 
+.btn-white { background: white; color: #1b6b2a; border-radius: 12px; }
+.btn-verde:hover { background: white; color: #1b6b2a; transform: translateY(-2px);}
+
 .roles-grid { display: grid; grid-template-columns: 7fr 3fr; gap: 1.5rem; align-items: start; }
 @media (max-width: 992px) { .roles-grid { grid-template-columns: 1fr; } }
 

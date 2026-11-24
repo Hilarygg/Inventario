@@ -29,15 +29,24 @@
     </ol>
 </nav>
 
-<div class="d-flex align-items-center gap-3 mb-4 pb-3 border-bottom border-success">
-    <i class="bi bi-cart-fill text-success" style="font-size: 2.5rem;"></i>
-    <div>
-        <h1 class="fw-bold mb-0 titulo-catalogo">Compras</h1>
-        <p class="text-muted mb-0">Registra los tickets de compra de productos.</p>
+<div class="d-flex justify-content-between align-items-center mb-4">
+    <div class="d-flex align-items-center gap-3">
+        <i class="bi bi-cart-fill text-success" style="font-size: 2.5rem;"></i>
+        <div>
+            <h1 class="fw-bold mb-0">Compras</h1>
+            <p class="text-muted mb-0">Registra los tickets de compra de productos.</p>
+        </div>
     </div>
+    @using (Html.BeginForm("Crear", "Catalogos", FormMethod.Get, new { @class = "m-0" }))
+    {
+        <button type="button" class="btn-agregar" data-bs-toggle="modal" data-bs-target="#modalSeleccionar">
+            <span class="btn-agregar-icono"><i class="bi bi-plus-lg"></i></span>
+            Agregar producto
+        </button>
+    }
 </div>
 
-@using (Html.BeginForm("Guardar", "Compra", FormMethod.Post, new { id = "formCompra" }))
+@using (Html.BeginForm("Guardar", "Compras", FormMethod.Post, new { id = "formCompra" }))
 {
     <div class="card panel-verde mb-3">
         <div class="panel-verde-header">
@@ -50,14 +59,19 @@
                     @Html.DropDownList("proveedor", (SelectList)ViewBag.Proveedores, "Selecciona un proveedor...", new { @class = "form-select", required = "required" })
                 </div>
                 <div class="col-md-3">
+                    <label class="form-label text-dark fw-semibold">Sucursal *</label>
+                    @Html.DropDownList("sucursal", (SelectList)ViewBag.Sucursal, "Selecciona una sucursal...", new { @class = "form-select", required = "required" })
+                </div>
+                <div class="col-md-2">
                     <label class="form-label text-dark fw-semibold">Fecha de compra *</label>
                     @Html.TextBox("fecha", DateTime.Today.ToString("yyyy-MM-dd"), new { @class = "form-control", type = "date", required = "required" })
                 </div>
-                <div class="col-md-3">
-                    <label class="form-label text-dark fw-semibold">Folio / Ticket *</label>
-                    @Html.TextBox("folio", "", new { @class = "form-control", placeholder = "Ej. TCK-001245", required = "required" })
+                <div class="col-md-2">
+                    <label class="form-label text-dark fw-semibold">Folio de compra</label>
+                    <input type="text" id="folio" class="form-control bg-light" value="@ViewBag.Folio" disabled />
+                    <div class="form-text">Se confirma al guardar.</div>
                 </div>
-                <div class="col-md-3">
+                <div class="col-md-2">
                     <label class="form-label text-dark fw-semibold">Usuario</label>
                     <input type="text" class="form-control" value="@User.Identity?.Name" disabled />
                 </div>
@@ -72,26 +86,15 @@
                     <span class="fw-bold"><i class="bi bi-box-seam me-2"></i>Productos del ticket</span>
                 </div>
                 <div class="p-3">
-                    <div class="row g-2 mb-3">
-                        <div class="col">
-                            <div class="input-group">
-                                <span class="input-group-text bg-white"><i class="bi bi-search"></i></span>
-                                <input type="text" class="form-control" placeholder="Buscar producto..." readonly
-                                       style="cursor:pointer" data-bs-toggle="modal" data-bs-target="#modalSeleccionar" />
-                            </div>
-                        </div>
-                        <div class="col-auto">
-                            <button type="button" class="btn btn-verde" data-bs-toggle="modal" data-bs-target="#modalSeleccionar">
-                                <i class="bi bi-plus-lg me-1"></i>Agregar producto
-                            </button>
-                        </div>
-                    </div>
-
                     <table class="table align-middle mb-0">
                         <thead class="table-success">
                             <tr>
-                                <th>Imagen</th><th>Producto</th><th>Cantidad</th>
-                                <th>Costo unitario</th><th>Subtotal</th><th>Acciones</th>
+                                <th>Imagen</th>
+                                <th>Producto</th>
+                                <th>Costo unitario</th>
+                                <th>Cantidad</th>
+                                <th>Subtotal</th>
+                                <th>Acciones</th>
                             </tr>
                         </thead>
                         <tbody id="filas"></tbody>
@@ -113,6 +116,7 @@
                     <dt class="col-5">Folio:</dt><dd class="col-7 fw-semibold" id="resFolio">—</dd>
                     <dt class="col-5">Fecha:</dt><dd class="col-7 fw-semibold" id="resFecha">—</dd>
                     <dt class="col-5">Proveedor:</dt><dd class="col-7 fw-semibold" id="resProveedor">—</dd>
+                    <dt class="col-5">Sucursal:</dt><dd class="col-7 fw-semibold" id="resSucursal">—</dd>
                     <dt class="col-5">Usuario:</dt><dd class="col-7 fw-semibold">@User.Identity?.Name</dd>
                 </dl>
                 <button type="submit" class="btn btn-verde w-100">
@@ -142,51 +146,77 @@
     const dinero = n => '$' + n.toLocaleString('es-MX', { minimumFractionDigits: 2, maximumFractionDigits: 2 });
 
     function elegirProducto(boton) {
-        const id = boton.dataset.id;
-        const existente = tbody.querySelector('tr[data-id="' + id + '"]');
-        if (existente) {
-            const c = existente.querySelector('.cantidad');
-            c.value = (parseFloat(c.value) || 0) + 1;
-            recalcular();
-            return;
-        }
+    const id = boton.dataset.id;
+    const existente = tbody.querySelector('tr[data-id="' + id + '"]');
 
-        const foto = imagenes[id]
-            ? '<img src="/Images/Productos/' + imagenes[id] + '" class="img-producto" alt="" />'
-            : '<i class="bi bi-image text-secondary fs-4"></i>';
-
-        const tr = document.createElement('tr');
-        tr.dataset.id = id;
-        tr.innerHTML =
-            '<td>' + foto + '</td>' +
-            '<td class="nombre"></td>' +
-            '<td><input type="hidden" name="productoId" value="' + id + '" />' +
-            '<input type="number" name="cantidad" class="form-control text-center cantidad" value="1" min="0.01" step="0.01" required /></td>' +
-            '<td><input type="number" name="costo" class="form-control text-center costo" value="0" min="0" step="0.01" required /></td>' +
-            '<td class="subtotal">$0.00</td>' +
-            '<td><button type="button" class="btn btn-danger btn-sm quitar"><i class="bi bi-trash-fill"></i></button></td>';
-        tr.querySelector('.nombre').textContent = boton.dataset.nombre;
-        tbody.appendChild(tr);
+    if (existente) {
+        const c = existente.querySelector('.cantidad');
+        c.value = (parseFloat(c.value) || 0) + 1;
         recalcular();
+        return;
     }
+
+    const foto = imagenes[id]
+        ? '<img src="/Images/Productos/' + imagenes[id] + '" class="img-producto" alt="" />'
+        : '<i class="bi bi-image text-secondary fs-4"></i>';
+
+    const tr = document.createElement('tr');
+    tr.dataset.id = id;
+
+    tr.innerHTML =
+        '<td>' + foto + '</td>' +
+        '<td>' +
+            '<div class="nombre fw-semibold"></div>' +
+            '<small class="contenido text-muted"></small>' +
+            '<small class="unidad text-muted"></small>' +
+        '</td>' +
+        '<td class="costo"></td>' +
+        '<td><input type="hidden" name="productoId" value="' + id + '" />' +
+        '<input type="hidden" name="costo" value="0" />' +
+        '<input type="number" name="cantidad" class="form-control text-center cantidad" value="1" min="1" step="1" required /></td>' +
+        '<td class="subtotal">$0.00</td>' +
+        '<td><button type="button" class="btn btn-danger btn-sm quitar"><i class="bi bi-trash-fill"></i></button></td>';
+
+    const costo = parseFloat(boton.dataset.costo) || 0;
+    tr.querySelector('input[name="costo"]').value = costo;
+
+
+    tr.querySelector('.nombre').textContent = boton.dataset.nombre;
+    tr.querySelector('.contenido').textContent = boton.dataset.contenido;
+    tr.querySelector('.unidad').textContent = boton.dataset.unidad;
+
+    tr.querySelector('.costo').textContent = dinero(costo);
+    tr.querySelector('.costo').dataset.valor = costo;
+
+    tbody.appendChild(tr);
+    recalcular();
+}
 
     function recalcular() {
         let total = 0;
+
         tbody.querySelectorAll('tr').forEach(tr => {
-            const sub = (parseFloat(tr.querySelector('.cantidad').value) || 0) * (parseFloat(tr.querySelector('.costo').value) || 0);
+            const cantidad = parseFloat(tr.querySelector('input[name="cantidad"]').value) || 0;
+            const costo = parseFloat(tr.querySelector('.costo').dataset.valor) || 0;
+
+            const sub = cantidad * costo;
+
             tr.querySelector('.subtotal').textContent = dinero(sub);
             total += sub;
         });
+
         document.getElementById('total').textContent = dinero(total);
         document.getElementById('sinProductos').classList.toggle('d-none', tbody.children.length > 0);
     }
 
     function actualizarResumen() {
         const prov = document.getElementById('proveedor');
+        const suc = document.getElementById('sucursal');
         const fecha = document.getElementById('fecha').value.split('-').reverse().join('/');
         document.getElementById('resFolio').textContent = document.getElementById('folio').value || '—';
         document.getElementById('resFecha').textContent = fecha || '—';
         document.getElementById('resProveedor').textContent = prov.value ? prov.options[prov.selectedIndex].text : '—';
+        document.getElementById('resSucursal').textContent = suc.value ? suc.options[suc.selectedIndex].text : '—';
     }
 
     tbody.addEventListener('input', recalcular);
@@ -196,15 +226,21 @@
             recalcular();
         }
     });
-    ['proveedor', 'fecha', 'folio'].forEach(id =>
-        document.getElementById(id).addEventListener('input', actualizarResumen));
+    ['proveedor', 'sucursal', 'fecha'].forEach(id =>
+    document.getElementById(id).addEventListener('input', actualizarResumen));
 
     document.getElementById('formCompra').addEventListener('submit', e => {
         if (!tbody.children.length) {
             e.preventDefault();
             document.getElementById('sinProductos').classList.add('text-danger');
+            return;
         }
+        e.target.querySelector('button[type="submit"]').disabled = true;
     });
+
+    setTimeout(() => document.querySelectorAll('.alert').forEach(a =>
+    bootstrap.Alert.getOrCreateInstance(a).close()), 4000);
+
 
     actualizarResumen();
 </script>

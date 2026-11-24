@@ -1,0 +1,39 @@
+@model List<Inventario.Models.Compra>
+
+@{
+    ViewData["Title"] = "Compras";
+}
+
+@if (TempData["Exito"] != null)
+{
+    <div class="alert alert-success alert-dismissible fade show" role="alert">
+        <i class="bi bi-check-circle-fill me-2"></i>@TempData["Exito"]
+    </div>
+}
+@if (TempData["Error"] != null)
+{
+    <div class="alert alert-danger alert-dismissible fade show" role="alert">
+        <i class="bi bi-exclamation-triangle-fill me-2"></i>@TempData["Error"]
+    </div>
+}
+
+<nav aria-label="breadcrumb">
+    <ol class="breadcrumb">
+        <li class="breadcrumb-item">
+            <a href="@Url.Action("Panel", "Home")" class="text-success text-decoration-none">
+                <i class="bi bi-house-fill me-1"></i>Inicio
+            </a>
+        </li>
+        <li class="breadcrumb-item active" aria-current="page">Historial</li>
+    </ol>
+</nav>
+
+<div class="d-flex justify-content-between align-items-center mb-4">
+    <div class="d-flex align-items-center gap-3">
+        <i class="bi bi-cart-fill text-success" style="font-size: 2.5rem;"></i>
+        <div>
+            <h1 class="fw-bold mb-0">Historial de Compras</h1>
+            <p class="text-muted mb-0">Consulta y da seguimiento a las compras registradas a tus proveedores.</p>
+        </div>
+    </div>
+</div>
