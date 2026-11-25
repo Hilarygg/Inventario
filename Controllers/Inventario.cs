@@ -60,4 +60,6 @@ public class InventarioController : Controller
 
         return View(new ConteoInventario().MostrarInventariado());
     }
+
+    
 }

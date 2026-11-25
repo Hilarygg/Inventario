@@ -6,8 +6,8 @@ public class Proveedor : ConsultaBase
 {
     public int pro_id { get; set; }
     public string pro_nombre { get; set; } = "";
-    public string pro_telefono  { get; set; } = "";
-    public string pro_correo { get; set; } = "";
+    public string? pro_telefono  { get; set; } = "";
+    public string? pro_correo { get; set; } = "";
     public Activo? pro_activo { get; set; }
 
 
@@ -49,8 +49,8 @@ public class Proveedor : ConsultaBase
             {
                 pro_id = reader.GetInt32(0),
                 pro_nombre = reader.GetString(1),
-                pro_telefono = reader.GetString(2),
-                pro_correo = reader.GetString(3),
+                pro_telefono = reader.IsDBNull(2) ? null : reader.GetString(2),
+                pro_correo = reader.IsDBNull(3) ? null : reader.GetString(3),
                 pro_activo = new Activo()
                 {
                     act_id = reader.GetInt32(4),
@@ -99,8 +99,8 @@ public class Proveedor : ConsultaBase
         {
             proveedor.pro_id = reader.GetInt32(0);
             proveedor.pro_nombre = reader.GetString(1);
-            proveedor.pro_telefono = reader.GetString(2);
-            proveedor.pro_correo = reader.GetString(3);
+            proveedor.pro_telefono = reader.IsDBNull(2) ? null : reader.GetString(2);
+            proveedor.pro_correo = reader.IsDBNull(3) ? null : reader.GetString(3);
             proveedor.pro_activo = new Activo()
             {
                 act_id = reader.GetInt32(4),

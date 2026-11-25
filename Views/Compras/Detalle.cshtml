@@ -1,0 +1,97 @@
+@model Inventario.Models.Compra
+
+@{
+    ViewData["Title"] = "Detalle de compra";
+    var detalle = ViewBag.Detalle as List<Inventario.Models.DetalleCompra> ?? new List<Inventario.Models.DetalleCompra>();
+}
+
+<nav aria-label="breadcrumb">
+    <ol class="breadcrumb">
+        <li class="breadcrumb-item">
+            <a href="@Url.Action("Panel", "Home")" class="text-success text-decoration-none">
+                <i class="bi bi-house-fill me-1"></i>Inicio
+            </a>
+        </li>
+        <li class="breadcrumb-item">
+            <a href="@Url.Action("Historial", "Compras")" class="text-success text-decoration-none">Historial de compras</a>
+        </li>
+        <li class="breadcrumb-item active" aria-current="page">@Model.com_folio</li>
+    </ol>
+</nav>
+
+<div class="d-flex align-items-center gap-3 mb-4">
+    <i class="bi bi-receipt text-success" style="font-size: 2.5rem;"></i>
+    <div>
+        <h1 class="fw-bold mb-0">Detalle de compra</h1>
+        <p class="text-muted mb-0">Productos que se compraron en el folio @Model.com_folio.</p>
+    </div>
+</div>
+
+<div class="row g-3">
+    <div class="col-xl-9">
+        <div class="card panel-verde">
+            <div class="panel-verde-header">
+                <span class="fw-bold"><i class="bi bi-box-seam me-2"></i>Productos de la compra</span>
+            </div>
+            <table class="table table-hover align-middle mb-0">
+                <thead class="table-success">
+                    <tr>
+                        <th>Imagen</th>
+                        <th>Producto</th>
+                        <th>Cantidad</th>
+                        <th>Costo unitario</th>
+                        <th>Subtotal</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    @foreach (var d in detalle)
+                    {
+                        <tr>
+                            <td>
+                                @if (!string.IsNullOrEmpty(d.det_producto?.prod_imagen))
+                                {
+                                    <img src="/Images/Productos/@d.det_producto.prod_imagen" alt="" class="img-producto" />
+                                }
+                                else
+                                {
+                                    <i class="bi bi-image text-secondary fs-4"></i>
+                                }
+                            </td>
+                            <td class="fw-semibold">@d.det_producto?.prod_nombre</td>
+                            <td>@d.det_cantidad.ToString("0.##")</td>
+                            <td>@d.det_costoUnitario.ToString("C")</td>
+                            <td>@d.det_subtotal.ToString("C")</td>
+                        </tr>
+                    }
+                </tbody>
+            </table>
+
+            @if (!detalle.Any())
+            {
+                <p class="text-center text-muted my-4">Esta compra no tiene productos registrados.</p>
+            }
+
+            <div class="d-flex justify-content-end align-items-center gap-3 p-3 border-top">
+                <span class="fw-bold fs-5">Total:</span>
+                <span class="fw-bold fs-3 verde">@Model.com_total.ToString("C")</span>
+            </div>
+        </div>
+    </div>
+
+    <div class="col-xl-3">
+        <div class="card resumen-compra p-3">
+            <h6 class="fw-bold text-success mb-3"><i class="bi bi-info-circle-fill me-2"></i>Resumen</h6>
+            <dl class="row small mb-3">
+                <dt class="col-5">Folio:</dt><dd class="col-7 fw-semibold">@Model.com_folio</dd>
+                <dt class="col-5">Fecha:</dt><dd class="col-7 fw-semibold">@Model.com_fechaCreacion.ToString("dd/MM/yyyy")</dd>
+                <dt class="col-5">Proveedor:</dt><dd class="col-7 fw-semibold">@Model.com_proveedor?.pro_nombre</dd>
+                <dt class="col-5">Sucursal:</dt><dd class="col-7 fw-semibold">@Model.com_sucursal?.suc_nombre</dd>
+                <dt class="col-5">Usuario:</dt><dd class="col-7 fw-semibold">@Model.com_usuario?.usu_username</dd>
+                <dt class="col-5">Estado:</dt><dd class="col-7 fw-semibold">@Model.com_estado</dd>
+            </dl>
+            <a class="btn btn-verde w-100" href="@Url.Action("Historial", "Compras")">
+                <i class="bi bi-arrow-left me-1"></i>Regresar
+            </a>
+        </div>
+    </div>
+</div>
