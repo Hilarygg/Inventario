@@ -44,6 +44,31 @@ public class ConsultaBase
             return false;
         }
     }
+
+    public int ExecutedCommandWithIdentity(string query, Dictionary<string, object?> parametros)
+    {
+        try
+        {
+            using SqlConnection conexion = new SqlConnection(_cadena);
+            using SqlCommand comando = new SqlCommand(query, conexion);
+
+            foreach (var p in parametros)
+                comando.Parameters.AddWithValue(p.Key, p.Value ?? DBNull.Value);
+
+            conexion.Open();
+
+            var resultado = comando.ExecuteScalar();
+
+            return resultado != null && resultado != DBNull.Value
+                ? Convert.ToInt32(resultado)
+                : 0;
+        }
+        catch (Exception ex)
+        {
+            Console.WriteLine(ex.Message);
+            return 0;
+        }
+    }
     
 };
 

@@ -16,7 +16,7 @@ public class ProductoController : Controller
         _imagen = imagen;
     }
 
-    public IActionResult Index(string? buscar, int? categoria, int? marca, int? proveedor, int? unidad, int? estado = 1)
+    public IActionResult Index(string? buscar, int? categoria, int? marca, int? unidad, int? estado = 1)
     {
         var productos = new Producto().MostrarProductos();
 
@@ -28,8 +28,6 @@ public class ProductoController : Controller
             productos = productos.Where(p => p.prod_marca?.mar_id == marca).ToList();
         if (estado != null)
             productos = productos.Where(p => p.prod_activo?.act_id == estado).ToList();
-        if (proveedor != null)
-            productos = productos.Where(p => p.prod_proveedor?.pro_id == proveedor).ToList();
         if (unidad != null)
             productos = productos.Where(p => p.prod_unidad?.uni_id == unidad).ToList();
 
@@ -37,7 +35,6 @@ public class ProductoController : Controller
         ViewBag.Categorias = new SelectList(new Categoria().MostrarCategoriasPublico(), "cat_id", "cat_nombre", categoria);
         ViewBag.Marcas = new SelectList(new Marca().MostrarMarcas(), "mar_id", "mar_nombre", marca);
         ViewBag.Estados = new SelectList(new Activo().MostrarActivos(), "act_id", "act_nombre", estado);
-        ViewBag.Proveedores = new SelectList(new Proveedor().MostrarProveedores(), "pro_id", "pro_nombre", proveedor);
         ViewBag.Unidades = new SelectList(new Unidad().MostrarUnidades(), "uni_id", "uni_nombre", unidad);
 
         return View(productos);
@@ -49,9 +46,32 @@ public class ProductoController : Controller
         producto.prod_imagen = _imagen.Guardar(imagen, "Productos");
 
         if (producto.InsertProducto())
+        {
+            int.TryParse(User.FindFirst(ClaimTypes.NameIdentifier)?.Value, out var usuarioId);
+
+            new HistorialPrecio()
+            {
+                // Precio de venta
+                his_precioAnterior = 0,
+                his_precioNuevo = producto.prod_precio,
+
+                // Costo del producto
+                his_costoAnterior = 0,
+                his_costoNuevo = producto.prod_costo,
+
+                // Información del registro
+                his_fechaCambio = DateTime.Now,
+                his_producto = new Producto { prod_id = producto.prod_id },
+                his_usuario = new Usuario { usu_id = usuarioId }
+
+            }.InsertHistorialPrecio();
+
             TempData["Exito"] = "Producto agregado correctamente.";
+        }
         else
+        {
             TempData["Error"] = "No se pudo agregar el producto.";
+        }
 
         return RedirectToAction("Index");
     }
@@ -60,27 +80,41 @@ public class ProductoController : Controller
     public IActionResult Modificar(Producto producto, IFormFile? imagen)
     {
         var anterior = new Producto().ObtenerProducto(producto.prod_id);
+
         producto.prod_imagen = _imagen.Guardar(imagen, "Productos", producto.prod_imagen);
 
         if (producto.ActualizarProducto())
         {
-            if (anterior.prod_id != 0 && anterior.prod_precio != producto.prod_precio)
+            if (anterior.prod_id != 0 &&
+                (anterior.prod_precio != producto.prod_precio ||
+                anterior.prod_costo != producto.prod_costo))
             {
                 int.TryParse(User.FindFirst(ClaimTypes.NameIdentifier)?.Value, out var usuarioId);
 
                 new HistorialPrecio()
                 {
+                    // Precio de venta
                     his_precioAnterior = anterior.prod_precio,
                     his_precioNuevo = producto.prod_precio,
+
+                    // Costo
+                    his_costoAnterior = anterior.prod_costo,
+                    his_costoNuevo = producto.prod_costo,
+
+                    // Información del cambio
                     his_fechaCambio = DateTime.Now,
                     his_producto = new Producto { prod_id = producto.prod_id },
                     his_usuario = new Usuario { usu_id = usuarioId }
+
                 }.InsertHistorialPrecio();
             }
+
             TempData["Exito"] = "Producto actualizado correctamente.";
         }
         else
+        {
             TempData["Error"] = "No se pudo actualizar el producto.";
+        }
 
         return RedirectToAction("Index");
     }
@@ -96,10 +130,8 @@ public class ProductoController : Controller
         ViewBag.Categorias = new SelectList(new Categoria().MostrarCategoriasPublico(), "cat_id", "cat_nombre", producto.prod_categoria?.cat_id);
         ViewBag.Marcas = new SelectList(new Marca().MostrarMarcas(), "mar_id", "mar_nombre", producto.prod_marca?.mar_id);
         ViewBag.Estados = new SelectList(new Activo().MostrarActivos(), "act_id", "act_nombre", producto.prod_activo?.act_id);
-        ViewBag.Proveedores = new SelectList(new Proveedor().MostrarProveedores(), "pro_id", "pro_nombre", producto.prod_proveedor?.pro_id);
         ViewBag.Unidades = new SelectList(new Unidad().MostrarUnidades(), "uni_id", "uni_nombre", producto.prod_unidad?.uni_id);
         
-
         return View(producto);
     }
 
@@ -147,11 +179,18 @@ public class ProductoController : Controller
         if (productoId != null)
         {
             ViewBag.Historial = new HistorialPrecio().MostrarHistorial(productoId.Value, anio);
-            ViewBag.ProductoNombre = productos.FirstOrDefault(p => p.prod_id == productoId)?.prod_nombre;
+
+            var producto = productos.FirstOrDefault(p => p.prod_id == productoId);
+
+            ViewBag.ProductoNombre = producto?.prod_nombre;
+            ViewBag.ProductoContenido = producto?.prod_contenido.ToString();
+            ViewBag.ProductoUnidad = producto?.prod_unidad?.uni_abreviatura;
         }
 
         ViewBag.ProductoId = productoId;
-        ViewBag.Anios = new SelectList(Enumerable.Range(DateTime.Now.Year - 5, 6).Reverse(), anio);
+        ViewBag.Anios = new SelectList(
+            Enumerable.Range(DateTime.Now.Year - 5, 6).Reverse(), anio
+        );
 
         return View(productos);
     }

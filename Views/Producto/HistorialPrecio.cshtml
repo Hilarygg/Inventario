@@ -21,6 +21,7 @@
     var historial = ViewBag.Historial as List<Inventario.Models.HistorialPrecio> ?? new();
     var etiquetas = historial.Select(h => h.his_fechaCambio.ToString("dd/MM/yyyy"));
     var valores = historial.Select(h => h.his_precioNuevo);
+    var costos = historial.Select(h => h.his_costoNuevo);
 }
 
 <nav aria-label="breadcrumb">
@@ -51,21 +52,37 @@
     }
 </div>
 
-@using (Html.BeginForm("HistorialPrecio", "Producto", FormMethod.Get, new { @class = "card card-body mb-4 mx-auto", style = "width: 50%;" }))
+@using (Html.BeginForm("HistorialPrecio", "Producto", FormMethod.Get,
+    new { @class = "card card-body mb-4 mx-auto", style = "width: 50%;" }))
 {
     @Html.Hidden("productoId", (int?)ViewBag.ProductoId, new { id = "productoId" })
 
     <div class="row g-3 align-items-end">
-        <div class="col-md-7">
-            <label class="form-label text-dark fw-semibold">Producto</label>
-            @Html.TextBox("productoNombre", (string?)ViewBag.ProductoNombre,
-                new { @class = "form-control", id = "productoNombre", @readonly = "readonly", placeholder = "Ningún producto seleccionado" })
-        </div>
+
+       <div class="col-md-7">
+        <label class="form-label text-dark fw-semibold">Producto</label>
+
+        <input type="text"
+            id="productoNombre"
+            class="form-control bg-light text-secondary"
+            value="@(ViewBag.ProductoNombre != null
+                ? $"{ViewBag.ProductoNombre} {ViewBag.ProductoContenido} {ViewBag.ProductoUnidad}"
+                : "")"
+            placeholder="Ningún producto seleccionado"
+            readonly />
+    </div>
 
         <div class="col-md-5">
             <label class="form-label text-dark fw-semibold">Año</label>
-            @Html.DropDownList("anio", (SelectList)ViewBag.Anios, new { @class = "form-select", onchange = "this.form.submit()" })
+
+            @Html.DropDownList("anio",
+                (SelectList)ViewBag.Anios,
+                new {
+                    @class = "form-select",
+                    onchange = "this.form.submit()"
+                })
         </div>
+
     </div>
 }
 
@@ -94,7 +111,12 @@
     <table class="table table-hover align-middle mb-0">
         <thead class="table-success">
             <tr>
-                <th>Fecha de actualización</th><th>Precio anterior</th><th>Nuevo precio</th><th>Usuario</th>
+                <th>Fecha de actualización</th>
+                <th>Costo anterior</th>
+                <th>Nuevo costo</th>
+                <th>Precio anterior</th>
+                <th>Nuevo precio</th>
+                <th>Usuario</th>
             </tr>
         </thead>
         <tbody>
@@ -102,6 +124,8 @@
             {
                 <tr>
                     <td>@h.his_fechaCambio.ToString("dd/MM/yyyy")</td>
+                    <td>@h.his_costoAnterior.ToString("C")</td>
+                    <td>@h.his_costoNuevo.ToString("C")</td>
                     <td>@h.his_precioAnterior.ToString("C")</td>
                     <td>@h.his_precioNuevo.ToString("C")</td>
                     <td>@h.his_usuario?.usu_username</td>
@@ -142,7 +166,7 @@
     <div class="modal-dialog modal-dialog modal-dialog-scrollable modal-md">
         <div class="modal-content">
             <div class="modal-header bg-success text-white justify-content-center">
-                <h5 class="modal-title">Seleccionar Producto</h5>
+                <h5 class="modal-title text-center">Seleccionar Producto</h5>
                 <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal"></button>
             </div>
             @await Html.PartialAsync("SeleccionarProducto", Model)
@@ -153,33 +177,66 @@
 @section Scripts {
 <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.7/dist/chart.umd.min.js"></script>
 <script>
-    function elegirProducto(fila) {
-        document.getElementById('productoId').value = fila.dataset.id;
-        document.getElementById('productoNombre').value = fila.dataset.nombre;
-        bootstrap.Modal.getInstance(document.getElementById('modalProducto')).hide();
-    }
+    function elegirProducto(boton) {
+
+    const id = boton.dataset.id;
+    const nombre = boton.dataset.nombre;
+    const contenido = boton.dataset.contenido;
+    const unidad = boton.dataset.unidad;
+
+    // Asignar el ID del producto
+    document.getElementById("productoId").value = id;
+
+    // Mostrar nombre, contenido y unidad
+    document.getElementById("productoNombre").value =
+        `${nombre} ${contenido} ${unidad}`;
+
+    // Enviar formulario para consultar el historial
+    document.getElementById("productoId").form.submit();
+}
 
     const lienzo = document.getElementById('graficaPrecios');
+
     if (lienzo) {
         new Chart(lienzo, {
             type: 'line',
             data: {
                 labels: @Html.Raw(System.Text.Json.JsonSerializer.Serialize(etiquetas)),
-                datasets: [{
-                    label: 'Precio de venta',
-                    data: @Html.Raw(System.Text.Json.JsonSerializer.Serialize(valores)),
-                    borderColor: '#1e5a3a',
-                    backgroundColor: '#1e5a3a',
-                    pointRadius: 5,
-                    tension: 0
-                }]
+                datasets: [
+                    {
+                        label: 'Precio de venta',
+                        data: @Html.Raw(System.Text.Json.JsonSerializer.Serialize(valores)),
+                        borderColor: '#198754',
+                        backgroundColor: '#198754',
+                        pointRadius: 5,
+                        tension: 0
+                    },
+                    {
+                        label: 'Costo del producto',
+                        data: @Html.Raw(System.Text.Json.JsonSerializer.Serialize(costos)),
+                        borderColor: '#fd7e14',
+                        backgroundColor: '#fd7e14',
+                        pointRadius: 5,
+                        tension: 0
+                    }
+                ]
             },
             options: {
-                plugins: { legend: { position: 'bottom' } },
+                responsive: true,
+                plugins: {
+                    legend: {
+                        position: 'bottom'
+                    }
+                },
                 scales: {
                     y: {
-                        title: { display: true, text: 'Precio ($)' },
-                        ticks: { callback: v => '$' + v }
+                        title: {
+                            display: true,
+                            text: 'Precio ($)'
+                        },
+                        ticks: {
+                            callback: v => '$' + v
+                        }
                     }
                 }
             }
